@@ -1,0 +1,82 @@
+/*
+  Estilos minimos del esqueleto. Esto lo reemplaza quien lidere Front-end.
+  Lo unico que conviene conservar es el bloque de foco visible: quitarlo
+  rompe el criterio 2.4.7 de WCAG, que es competencia evaluada en el curso.
+*/
+
+:root {
+  --texto: #1a1a1a;
+  --fondo: #ffffff;
+  --borde: #d4d4d4;
+  --acento: #1d4ed8;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--texto);
+  background: var(--fondo);
+  line-height: 1.5;
+}
+
+/* Enlace para saltar al contenido. Solo aparece al navegar con teclado.
+   Evita que quien usa teclado tenga que recorrer el menu en cada pagina. */
+.saltar-al-contenido {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--acento);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  z-index: 10;
+}
+.saltar-al-contenido:focus {
+  left: 0;
+}
+
+/* Foco visible. No quitar. */
+:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.contenedor {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--borde);
+  padding-bottom: 0.75rem;
+}
+
+nav a {
+  color: var(--acento);
+  text-decoration: none;
+  padding: 0.25rem 0;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* La ruta activa se marca con texto en negrita ademas del color.
+   El color no puede ser el unico portador de informacion (WCAG 1.4.1). */
+nav a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.estado-servicio {
+  border: 1px solid var(--borde);
+  padding: 0.75rem 1rem;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+}
