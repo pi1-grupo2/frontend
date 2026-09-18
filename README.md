@@ -29,7 +29,7 @@ Son las que define la arquitectura de información del Sprint 0. Hoy son pantall
 criterio C7 pide que la SPA corra, no que las vistas estén implementadas.
 
 | Ruta | Para qué | Entra en |
-|---|---|---|
+| --- | --- | --- |
 | `/hoy` | Gestiones urgentes del día, vencidas y próximas | Sprint 2 |
 | `/crear` | Crear evento y plan inicial de subtareas | Sprint 1 |
 | `/evento/:id` | Detalle, edición, reprogramación y conflicto | Sprints 1 y 3 |
@@ -39,7 +39,7 @@ criterio C7 pide que la SPA corra, no que las vistas estén implementadas.
 ## Variables de entorno
 
 | Variable | Para qué sirve |
-|---|---|
+| --- | --- |
 | `VITE_API_URL` | URL base de la API, terminada en `/api` |
 
 En Vite solo las variables con prefijo `VITE_` llegan al navegador, y por eso mismo quedan visibles
@@ -69,7 +69,7 @@ Al reemplazar los estilos, conservar el bloque de foco visible.
 ## Despliegue
 
 | Entorno | URL |
-|---|---|
+| --- | --- |
 | Frontend en producción | pendiente |
 | API | pendiente |
 
