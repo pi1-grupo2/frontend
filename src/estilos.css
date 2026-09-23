@@ -80,3 +80,17 @@ nav a[aria-current="page"] {
   margin-top: 2rem;
   font-size: 0.9rem;
 }
+/* Errores de validación del formulario */
+.error-campo {
+  color: #d32f2f;
+  font-weight: 600;
+  margin: 0.35rem 0 0;
+}
+
+[aria-invalid="true"] {
+  border: 2px solid #d32f2f;
+}
+
+[role="alert"] {
+  color: #d32f2f;
+}
