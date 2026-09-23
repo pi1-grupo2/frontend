@@ -172,16 +172,16 @@ export default function Crear() {
           'Las horas estimadas deben ser un valor mayor a 0 (ej. 1.5, 3).'
       }
 
-if (!subtarea.target_date) {
-  errores.target_date =
-    'Este campo es obligatorio para planificar la gestión.'
-} else if (
-  formulario.event_date &&
-  subtarea.target_date > formulario.event_date
-) {
-  errores.target_date =
-    'La fecha objetivo no puede ser posterior a la fecha del evento.'
-}
+      if (!subtarea.target_date) {
+        errores.target_date =
+          'Este campo es obligatorio para planificar la gestión.'
+      } else if (
+        formulario.event_date &&
+        subtarea.target_date > formulario.event_date
+      ) {
+        errores.target_date =
+          'La fecha objetivo no puede ser posterior a la fecha del evento.'
+      }
 
       if (Object.keys(errores).length > 0) {
         nuevosErroresSubtareas[subtarea.id] = errores
@@ -244,65 +244,57 @@ if (!subtarea.target_date) {
 
   if (isSuccess && eventoCreado) {
     return (
-      <section>
-        <h1>Evento creado</h1>
-
-        <p role="status">
-          ¡El evento y su plan logístico inicial se guardaron con éxito!
-        </p>
-
-        <p>
-          Evento: <strong>{eventoCreado.name}</strong>
-        </p>
-
-        <button
-          type="button"
-          onClick={() => {
-            window.location.href = `/evento/${eventoCreado.id}`
-          }}
-        >
-          Ver evento
-        </button>
+      <section className="pagina-formulario">
+        <div className="aviso aviso-exito" role="status">
+          <h2>Evento creado</h2>
+          <p>
+            El evento y su plan logístico inicial se guardaron con éxito.
+          </p>
+          <p>
+            Evento: <strong>{eventoCreado.name}</strong>
+          </p>
+          <a className="boton boton-primario" href={`/evento/${eventoCreado.id}`}>
+            Ver evento
+          </a>
+        </div>
       </section>
     )
   }
 
   return (
-    <section>
-      <a href="/hoy">← Volver a Hoy</a>
+    <section className="pagina-formulario">
+      <a className="enlace-volver" href="/hoy">← Volver a Hoy</a>
 
-      <h1>Crear nuevo evento</h1>
+      <h2>Crear nuevo evento</h2>
 
-      <p>
+      <p className="intro-pagina">
         Define las coordenadas clave de tu evento y estructura su
         plan logístico inicial con subtareas.
       </p>
 
       {hasError && (
-        <div role="alert">
-          <h2>No se pudo guardar</h2>
-
+        <div className="aviso aviso-error" role="alert">
+          <h3>No se pudo guardar</h3>
           <p>
             Tuvimos un inconveniente al conectar con el servidor.
             Tus datos no se perdieron; intenta nuevamente.
           </p>
-
-          <button type="button" onClick={reintentar}>
+          <button type="button" className="boton boton-secundario" onClick={reintentar}>
             Reintentar
           </button>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} noValidate>
+      <form className="formulario" onSubmit={handleSubmit} noValidate>
         <fieldset>
-          <legend>1. Identidad y Propósito del Evento</legend>
+          <legend>1. Identidad y propósito del evento</legend>
 
-          <div>
+          <div className="campo">
             <label htmlFor="name">
               Nombre del evento <span aria-hidden="true">*</span>
             </label>
 
-            <small>
+            <small id="ayuda-name" className="ayuda-campo">
               Nombre descriptivo para identificarlo rápidamente en
               el tablero y calendario.
             </small>
@@ -314,7 +306,7 @@ if (!subtarea.target_date) {
               value={formulario.name}
               onChange={cambiarCampo}
               placeholder="Ej: Boda de Laura y Andrés"
-              aria-describedby={errores.name ? 'error-name' : undefined}
+              aria-describedby={errores.name ? 'ayuda-name error-name' : 'ayuda-name'}
               aria-invalid={Boolean(errores.name)}
             />
 
@@ -325,7 +317,7 @@ if (!subtarea.target_date) {
             )}
           </div>
 
-          <div>
+          <div className="campo">
             <label htmlFor="event_type">
               Tipo de evento <span aria-hidden="true">*</span>
             </label>
@@ -363,7 +355,7 @@ if (!subtarea.target_date) {
             )}
           </div>
 
-          <div>
+          <div className="campo">
             <label htmlFor="client_contact">
               Cliente o contacto principal
             </label>
@@ -380,9 +372,10 @@ if (!subtarea.target_date) {
         </fieldset>
 
         <fieldset>
-          <legend>2. Coordenadas Operativas y Capacidad</legend>
+          <legend>2. Coordenadas operativas</legend>
 
-          <div>
+          <div className="rejilla-campos">
+          <div className="campo">
             <label htmlFor="event_date">
               Fecha del evento <span aria-hidden="true">*</span>
             </label>
@@ -408,7 +401,7 @@ if (!subtarea.target_date) {
             )}
           </div>
 
-          <div>
+          <div className="campo">
             <label htmlFor="start_time">
               Hora de inicio <span aria-hidden="true">*</span>
             </label>
@@ -433,10 +426,11 @@ if (!subtarea.target_date) {
               </p>
             )}
           </div>
+          </div>
 
-          <div>
+          <div className="campo">
             <label htmlFor="location">
-              Lugar / Sede principal
+              Lugar / Sede principal <span aria-hidden="true">*</span>
             </label>
 
             <input
@@ -460,16 +454,25 @@ if (!subtarea.target_date) {
               </p>
             )}
           </div>
+        </fieldset>
 
-          <div>
+        <fieldset>
+          <legend>3. Preferencias de planificación</legend>
+
+          <p className="intro-seccion">
+            Esto no es un dato del evento: indica cuántas horas al día
+            puedes dedicar a prepararlo, para avisarte si el plan queda
+            sobrecargado.
+          </p>
+
+          <div className="campo campo-estrecho">
             <label htmlFor="daily_hours_limit">
-              Límite diario de gestión para sobrecarga (US-12)
+              Horas máximas de preparación por día
               <span aria-hidden="true"> *</span>
             </label>
 
-            <small>
-              Horas máximas de preparación por día recomendadas
-              (por defecto: 6h).
+            <small id="ayuda-daily-hours" className="ayuda-campo">
+              Recomendado: 6 horas. Debe estar entre 1 y 16.
             </small>
 
             <input
@@ -483,14 +486,14 @@ if (!subtarea.target_date) {
               onChange={cambiarCampo}
               aria-describedby={
                 errores.daily_hours_limit
-                  ? 'error-daily-hours'
-                  : undefined
+                  ? 'ayuda-daily-hours error-daily-hours'
+                  : 'ayuda-daily-hours'
               }
               aria-invalid={Boolean(errores.daily_hours_limit)}
             />
 
             {errores.daily_hours_limit && (
-              <p id="error-daily-hours" role="alert">
+              <p id="error-daily-hours" role="alert" className="error-campo">
                 {errores.daily_hours_limit}
               </p>
             )}
@@ -498,9 +501,9 @@ if (!subtarea.target_date) {
         </fieldset>
 
         <fieldset>
-          <legend>3. Plan Logístico Inicial (Subtareas T1)</legend>
+          <legend>4. Plan logístico inicial</legend>
 
-          <p>
+          <p className="intro-seccion">
             Desglosa las primeras gestiones clave (catering, salón,
             invitaciones) con su fecha objetivo y esfuerzo estimado
             para arrancar la planificación.
@@ -511,21 +514,24 @@ if (!subtarea.target_date) {
               erroresSubtareas[subtarea.id] || {}
 
             return (
-              <div key={subtarea.id}>
-                <h3>
-                  Gestión Logística #{indice + 1}
-                </h3>
+              <div key={subtarea.id} className="tarjeta-gestion">
+                <div className="encabezado-gestion">
+                  <h3>
+                    Gestión logística #{indice + 1}
+                  </h3>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    eliminarSubtarea(subtarea.id)
-                  }
-                >
-                  Eliminar
-                </button>
+                  <button
+                    type="button"
+                    className="boton boton-peligro"
+                    onClick={() =>
+                      eliminarSubtarea(subtarea.id)
+                    }
+                  >
+                    Eliminar
+                  </button>
+                </div>
 
-                <div>
+                <div className="campo">
                   <label htmlFor={`subtask-name-${subtarea.id}`}>
                     Nombre de la gestión{' '}
                     <span aria-hidden="true">*</span>
@@ -553,7 +559,8 @@ if (!subtarea.target_date) {
                   )}
                 </div>
 
-                <div>
+                <div className="rejilla-campos">
+                <div className="campo">
                   <label
                     htmlFor={`subtask-hours-${subtarea.id}`}
                   >
@@ -587,7 +594,7 @@ if (!subtarea.target_date) {
                   )}
                 </div>
 
-                <div>
+                <div className="campo">
                   <label
                     htmlFor={`subtask-date-${subtarea.id}`}
                   >
@@ -617,8 +624,9 @@ if (!subtarea.target_date) {
                     </p>
                   )}
                 </div>
+                </div>
 
-                <div>
+                <div className="campo">
                   <label
                     htmlFor={`subtask-note-${subtarea.id}`}
                   >
@@ -645,26 +653,28 @@ if (!subtarea.target_date) {
 
           <button
             type="button"
+            className="boton boton-secundario"
             onClick={agregarSubtarea}
           >
             + Agregar otra gestión logística
           </button>
         </fieldset>
 
-        <footer>
+        <div className="acciones-formulario">
           <button
             type="button"
+            className="boton boton-secundario"
             onClick={() => window.history.back()}
           >
             Cancelar
           </button>
 
-          <button type="submit" disabled={isLoading}>
+          <button type="submit" className="boton boton-primario" disabled={isLoading}>
             {isLoading
               ? 'Guardando...'
-              : 'Crear Evento y Plan Inicial'}
+              : 'Crear evento y plan inicial'}
           </button>
-        </footer>
+        </div>
       </form>
     </section>
   )
