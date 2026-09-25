@@ -1,14 +1,24 @@
 /*
-  Estilos minimos del esqueleto. Esto lo reemplaza quien lidere Front-end.
-  Lo unico que conviene conservar es el bloque de foco visible: quitarlo
-  rompe el criterio 2.4.7 de WCAG, que es competencia evaluada en el curso.
+  Guia de UI del Organizador de Eventos.
+  Lo unico que no se puede quitar es el bloque de foco visible:
+  romperlo incumple el criterio 2.4.7 de WCAG (competencia evaluada).
 */
 
 :root {
   --texto: #1a1a1a;
-  --fondo: #ffffff;
+  --texto-suave: #525252;
+  --fondo: #f4f6f8;
+  --superficie: #ffffff;
   --borde: #d4d4d4;
   --acento: #1d4ed8;
+  --acento-hover: #1e40af;
+  --acento-suave: #eff6ff;
+  --peligro: #b91c1c;
+  --peligro-fondo: #fef2f2;
+  --exito: #166534;
+  --exito-fondo: #f0fdf4;
+  --radio: 0.5rem;
+  --sombra: 0 1px 2px rgba(26, 26, 26, 0.06);
 }
 
 body {
@@ -43,18 +53,23 @@ body {
 .contenedor {
   max-width: 60rem;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1rem 1.25rem 2rem;
+}
+
+.contenedor > header h1 {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 700;
 }
 
 nav ul {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  padding: 0;
-  margin: 0 0 1rem;
+  gap: 0.25rem 1.25rem;
+  padding: 0 0 0.85rem;
+  margin: 0 0 1.5rem;
   border-bottom: 1px solid var(--borde);
-  padding-bottom: 0.75rem;
 }
 
 nav a {
@@ -74,23 +89,285 @@ nav a[aria-current="page"] {
   text-decoration: underline;
 }
 
+main h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+main p {
+  color: var(--texto-suave);
+}
+
 .estado-servicio {
   border: 1px solid var(--borde);
+  background: var(--superficie);
+  border-radius: var(--radio);
   padding: 0.75rem 1rem;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   font-size: 0.9rem;
 }
+
+.estado-servicio h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  color: var(--texto);
+}
+
+.estado-servicio p {
+  margin: 0;
+}
+
 /* Errores de validación del formulario */
-.error-campo {
-  color: #d32f2f;
+.error-campo,
+.campo p[role="alert"] {
+  color: var(--peligro);
   font-weight: 600;
   margin: 0.35rem 0 0;
+  font-size: 0.9rem;
 }
 
 [aria-invalid="true"] {
-  border: 2px solid #d32f2f;
+  border-color: var(--peligro) !important;
+  background: var(--peligro-fondo);
 }
 
-[role="alert"] {
-  color: #d32f2f;
+/* --- Formulario (C4) --- */
+
+.pagina-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.enlace-volver {
+  color: var(--acento);
+  text-decoration: none;
+  font-size: 0.95rem;
+  width: fit-content;
+}
+
+.enlace-volver:hover {
+  text-decoration: underline;
+}
+
+.intro-pagina,
+.intro-seccion {
+  margin: 0 0 0.25rem;
+  max-width: 40rem;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.formulario fieldset {
+  margin: 0;
+  padding: 1.15rem 1.2rem 1.25rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formulario legend {
+  padding: 0 0.4rem;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.campo label {
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.ayuda-campo {
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+}
+
+.campo-estrecho input {
+  max-width: 12rem;
+}
+
+.rejilla-campos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.formulario input,
+.formulario select,
+.formulario textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--borde);
+  border-radius: 0.4rem;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+}
+
+.formulario textarea {
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+.formulario input::placeholder,
+.formulario textarea::placeholder {
+  color: #737373;
+}
+
+.formulario select {
+  cursor: pointer;
+}
+
+.tarjeta-gestion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: #fafbfc;
+}
+
+.encabezado-gestion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.encabezado-gestion h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.acciones-formulario {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 0.4rem;
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.boton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.boton-primario {
+  background: var(--acento);
+  color: #fff;
+}
+
+.boton-primario:hover:not(:disabled) {
+  background: var(--acento-hover);
+}
+
+.boton-secundario {
+  background: var(--superficie);
+  color: var(--texto);
+  border-color: var(--borde);
+}
+
+.boton-secundario:hover:not(:disabled) {
+  background: var(--acento-suave);
+  border-color: var(--acento);
+  color: var(--acento);
+}
+
+.boton-peligro {
+  background: var(--superficie);
+  color: var(--peligro);
+  border-color: #fecaca;
+}
+
+.boton-peligro:hover:not(:disabled) {
+  background: var(--peligro-fondo);
+}
+
+.aviso {
+  padding: 1rem 1.15rem;
+  border-radius: var(--radio);
+  border: 1px solid var(--borde);
+}
+
+.aviso h2,
+.aviso h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.aviso p {
+  margin: 0 0 0.75rem;
+}
+
+.aviso-error {
+  background: var(--peligro-fondo);
+  border-color: #fecaca;
+  color: var(--peligro);
+}
+
+.aviso-error p,
+.aviso-error h3 {
+  color: var(--peligro);
+}
+
+.aviso-exito {
+  background: var(--exito-fondo);
+  border-color: #bbf7d0;
+}
+
+.aviso-exito h2,
+.aviso-exito p {
+  color: var(--exito);
+}
+
+@media (max-width: 39.99rem) {
+  .acciones-formulario {
+    flex-direction: column-reverse;
+  }
+
+  .acciones-formulario .boton {
+    width: 100%;
+  }
+}
+
+@media (min-width: 40rem) {
+  .rejilla-campos {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .acciones-formulario {
+    margin-top: 0.25rem;
+  }
 }
