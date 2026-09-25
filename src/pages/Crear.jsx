@@ -306,6 +306,7 @@ export default function Crear() {
               {errores.hora && <p id="error-hora" className="error-campo" role="alert">{errores.hora}</p>}
             </div>
           </div>
+          </div>
 
           <div className="campo">
             <label htmlFor="lugar">
@@ -321,6 +322,7 @@ export default function Crear() {
             />
             {errores.lugar && <p id="error-lugar" className="error-campo" role="alert">{errores.lugar}</p>}
           </div>
+        </fieldset>
 
           <div className="campo campo-estrecho">
             <label htmlFor="limite">
