@@ -1,48 +1,103 @@
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api'
 
-/**
- * Consulta el endpoint de salud de la API.
- *
- * Se conserva porque pertenece al Sprint 0.
- */
-export async function consultarSalud() {
-  const respuesta = await fetch(`${API_URL}/health/`)
-
-  if (!respuesta.ok) {
-    throw new Error(`La API respondio ${respuesta.status}`)
+export class ErrorApi extends Error {
+  constructor(mensaje, status, datos) {
+    super(mensaje)
+    this.status = status
+    this.datos = datos
   }
-
-  return respuesta.json()
 }
 
-/**
- * Mock temporal para US-01.
- *
- * Simula la creación de un evento mientras el endpoint real
- * del backend todavía no está disponible.
- *
- * El objeto enviado respeta el contrato definido para POST /api/events/.
- */
-export async function crearEventoMock(evento) {
-  // Simula el tiempo de respuesta del servidor.
-  await new Promise((resolve) => setTimeout(resolve, 1200))
-
-  // Para probar el estado de error temporalmente,
-  // descomenta la siguiente línea:
-  // throw new Error('MOCK_ERROR')
-
-  return {
-    success: true,
-    message: 'Evento creado correctamente',
-    data: {
-      id: 1,
-      ...evento,
-      status: 'planning',
-      progress: 0,
-      completed_tasks: 0,
-      total_tasks: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
+async function solicitar(ruta, opciones = {}) {
+  let respuesta
+  try {
+    respuesta = await fetch(`${API_URL}${ruta}`, {
+      ...opciones,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(opciones.headers ?? {}),
+      },
+    })
+  } catch {
+    throw new ErrorApi(
+      'Tuvimos un inconveniente al conectar con el servidor. Tus datos no se perdieron; intenta nuevamente.',
+      0,
+      null,
+    )
   }
+
+  if (respuesta.status === 204) {
+    return null
+  }
+
+  const texto = await respuesta.text()
+  const datos = texto ? JSON.parse(texto) : null
+
+  if (!respuesta.ok) {
+    throw new ErrorApi(
+      'Tuvimos un inconveniente al conectar con el servidor. Tus datos no se perdieron; intenta nuevamente.',
+      respuesta.status,
+      datos,
+    )
+  }
+
+  return datos
+}
+
+export function consultarSalud() {
+  return solicitar('/health/')
+}
+
+export function obtenerOrganizador() {
+  return solicitar('/organizador/')
+}
+
+export function actualizarOrganizador(datos) {
+  return solicitar('/organizador/', { method: 'PATCH', body: JSON.stringify(datos) })
+}
+
+export function listarEventos() {
+  return solicitar('/events/')
+}
+
+export function obtenerEvento(eventoId) {
+  return solicitar(`/events/${eventoId}/`)
+}
+
+export function crearEvento(evento) {
+  return solicitar('/events/', { method: 'POST', body: JSON.stringify(evento) })
+}
+
+export function actualizarEvento(eventoId, datos) {
+  return solicitar(`/events/${eventoId}/`, { method: 'PATCH', body: JSON.stringify(datos) })
+}
+
+export function eliminarEvento(eventoId) {
+  return solicitar(`/events/${eventoId}/`, { method: 'DELETE' })
+}
+
+export function listarSubtareas(eventoId) {
+  return solicitar(`/events/${eventoId}/subtasks/`)
+}
+
+export function crearSubtarea(eventoId, subtarea) {
+  return solicitar(`/events/${eventoId}/subtasks/`, {
+    method: 'POST',
+    body: JSON.stringify(subtarea),
+  })
+}
+
+export function actualizarSubtarea(eventoId, subtareaId, datos) {
+  return solicitar(`/events/${eventoId}/subtasks/${subtareaId}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(datos),
+  })
+}
+
+export function eliminarSubtarea(eventoId, subtareaId) {
+  return solicitar(`/events/${eventoId}/subtasks/${subtareaId}/`, { method: 'DELETE' })
+}
+
+export function obtenerProgreso(eventoId) {
+  return solicitar(`/events/${eventoId}/progress/`)
 }
