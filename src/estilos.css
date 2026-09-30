@@ -359,16 +359,6 @@ h3 { margin: 0; font-size: 1.05rem; }
 .insignia-para_hoy { background: #fef3c7; color: #92400e; }
 .insignia-proxima { background: #e0e7ff; color: #3730a3; }
 
-.regla-prioridad {
-  margin: 0.75rem 0 1rem;
-  padding: 0.9rem 1rem;
-  background: #f5f3ff;
-  border: 1px solid #ddd6fe;
-  border-left: 4px solid var(--acento);
-  border-radius: var(--radio);
-}
-.regla-prioridad p { margin: 0.15rem 0; }
-
 .grupo-prioridad { margin-top: 1.15rem; }
 .grupo-prioridad h2 { margin-bottom: 0.15rem; }
 .grupo-prioridad .lista-gestiones { margin-top: 0.55rem; }

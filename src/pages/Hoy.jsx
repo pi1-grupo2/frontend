@@ -91,15 +91,6 @@ export default function Hoy() {
       <h1>Hoy</h1>
       <p className="intro">Tus gestiones pendientes, ordenadas por prioridad.</p>
 
-      {!cargando && !error && (
-        <div className="regla-prioridad">
-          <p>Primero se muestran las gestiones vencidas, porque su fecha ya pasó y siguen pendientes.</p>
-          <p>Después aparecen las de hoy, que debes resolver antes de que termine el día.</p>
-          <p>Al final van las próximas, de la fecha más cercana a la más lejana.</p>
-          <p>Las gestiones ejecutadas no se incluyen en esta vista.</p>
-        </div>
-      )}
-
       {cargando && <div className="esqueleto esqueleto-bloque" aria-busy="true" />}
 
       {error && (
