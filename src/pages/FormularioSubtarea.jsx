@@ -9,6 +9,7 @@ export default function FormularioSubtarea({ eventoId, fechaEvento, alCrear }) {
   const [isLoading, setIsLoading] = useState(false)
   const [hasError, setHasError] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [abierto, setAbierto] = useState(false)
 
   function validar() {
     const fallo = {}
@@ -44,12 +45,28 @@ export default function FormularioSubtarea({ eventoId, fechaEvento, alCrear }) {
       setHorasEstimadas('')
       setFechaObjetivo('')
       setIsSuccess(true)
+      setAbierto(false)
       if (alCrear) await alCrear()
     } catch {
       setHasError(true)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (!abierto) {
+    return (
+      <div id="nueva-gestion">
+        {isSuccess && (
+          <p className="ayuda-campo mensaje-centrado" role="status">La gestión se agregó correctamente.</p>
+        )}
+        <div className="centro-accion">
+          <button type="button" className="boton boton-primario" onClick={() => setAbierto(true)}>
+            Agregar gestión logística
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -109,10 +126,15 @@ export default function FormularioSubtarea({ eventoId, fechaEvento, alCrear }) {
           {errores.fechaObjetivo && <p className="error-campo" role="alert">{errores.fechaObjetivo}</p>}
         </div>
       </div>
-      <button type="submit" className="boton boton-primario" disabled={isLoading}>
-        {isLoading && <span className="spinner" aria-hidden="true" />}
-        {isLoading ? 'Guardando...' : '+ Subtarea'}
-      </button>
+      <div className="centro-accion">
+        <button type="button" className="boton boton-secundario" onClick={() => setAbierto(false)}>
+          Cancelar
+        </button>
+        <button type="submit" className="boton boton-primario" disabled={isLoading}>
+          {isLoading && <span className="spinner" aria-hidden="true" />}
+          {isLoading ? 'Guardando...' : 'Guardar gestión'}
+        </button>
+      </div>
     </form>
   )
 }
