@@ -3,10 +3,25 @@ import { Link } from 'react-router-dom'
 import { listarEventos, listarSubtareas } from '../api'
 import { etiquetaSituacion } from '../formato'
 
+const GRUPOS = [
+  { id: 'VENCIDA', titulo: 'Vencidas' },
+  { id: 'PARA_HOY', titulo: 'Para hoy' },
+  { id: 'PROXIMA', titulo: 'Próximas' },
+]
+
 const ESTADOS_FILTRO = [
   { value: 'VENCIDA', label: 'Vencida' },
   { value: 'PARA_HOY', label: 'Para hoy' },
+  { value: 'PROXIMA', label: 'Próxima' },
 ]
+
+function ordenarGestiones(lista) {
+  return [...lista].sort((a, b) => {
+    if (a.fecha_objetivo < b.fecha_objetivo) return -1
+    if (a.fecha_objetivo > b.fecha_objetivo) return 1
+    return a.nombre.localeCompare(b.nombre, 'es')
+  })
+}
 
 export default function Hoy() {
   const [eventos, setEventos] = useState([])
@@ -15,6 +30,7 @@ export default function Hoy() {
   const [filtroEstado, setFiltroEstado] = useState('')
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(false)
+  const [consulta, setConsulta] = useState(0)
 
   useEffect(() => {
     let vigente = true
@@ -28,7 +44,7 @@ export default function Hoy() {
           listaEventos.map(async (evento) => {
             const subtareas = await listarSubtareas(evento.id)
             return subtareas
-              .filter((subtarea) => subtarea.situacion === 'PARA_HOY' || subtarea.situacion === 'VENCIDA')
+              .filter((subtarea) => subtarea.situacion !== 'EJECUTADA')
               .map((subtarea) => ({ ...subtarea, eventoNombre: evento.nombre, eventoId: evento.id }))
           }),
         )
@@ -46,7 +62,7 @@ export default function Hoy() {
     return () => {
       vigente = false
     }
-  }, [])
+  }, [consulta])
 
   const filtrosActivos = filtroEvento !== '' || filtroEstado !== ''
 
@@ -58,6 +74,13 @@ export default function Hoy() {
     })
   }, [gestiones, filtroEvento, filtroEstado])
 
+  const gruposVisibles = useMemo(() => {
+    return GRUPOS.map((grupo) => ({
+      ...grupo,
+      gestiones: ordenarGestiones(visibles.filter((gestion) => gestion.situacion === grupo.id)),
+    })).filter((grupo) => grupo.gestiones.length > 0)
+  }, [visibles])
+
   function limpiarFiltros() {
     setFiltroEvento('')
     setFiltroEstado('')
@@ -66,23 +89,36 @@ export default function Hoy() {
   return (
     <section className="pagina">
       <h1>Hoy</h1>
-      <p className="intro">Gestiones vencidas y las que debes resolver hoy.</p>
+      <p className="intro">Tus gestiones pendientes, ordenadas por prioridad.</p>
+
+      {!cargando && !error && (
+        <div className="regla-prioridad">
+          <p>Primero se muestran las gestiones vencidas, porque su fecha ya pasó y siguen pendientes.</p>
+          <p>Después aparecen las de hoy, que debes resolver antes de que termine el día.</p>
+          <p>Al final van las próximas, de la fecha más cercana a la más lejana.</p>
+          <p>Las gestiones ejecutadas no se incluyen en esta vista.</p>
+        </div>
+      )}
 
       {cargando && <div className="esqueleto esqueleto-bloque" aria-busy="true" />}
 
       {error && (
-        <div className="aviso aviso-error" role="alert">
+        <div className="estado-vacio" role="alert">
+          <div className="icono-estado icono-error" aria-hidden="true">!</div>
           <h2>No se pudieron cargar las gestiones</h2>
           <p>Tuvimos un inconveniente al conectar con el servidor.</p>
+          <button type="button" className="boton boton-secundario" onClick={() => setConsulta((valor) => valor + 1)}>
+            Intentar de nuevo
+          </button>
         </div>
       )}
 
       {!cargando && !error && gestiones.length === 0 && (
         <div className="estado-vacio">
           <div className="icono-estado" aria-hidden="true">📖</div>
-          <h2>No tienes gestiones para hoy</h2>
-          <p>Cuando una gestión venza o tenga fecha de hoy, aparecerá en esta lista.</p>
-          <Link className="boton boton-primario" to="/crear">+ Crear nuevo evento</Link>
+          <h2>No tienes gestiones pendientes</h2>
+          <p>Crea un evento y agrega su plan. Aquí verás primero lo vencido, luego lo de hoy y al final lo próximo.</p>
+          <Link className="boton boton-primario" to="/crear">Crear evento</Link>
         </div>
       )}
 
@@ -122,7 +158,7 @@ export default function Hoy() {
         </form>
       )}
 
-      {!cargando && !error && gestiones.length > 0 && visibles.length === 0 && (
+      {!cargando && !error && gestiones.length > 0 && gruposVisibles.length === 0 && (
         <div className="estado-vacio" role="status">
           <div className="icono-estado icono-error" aria-hidden="true">!</div>
           <h2>Ninguna gestión coincide con los filtros</h2>
@@ -133,23 +169,30 @@ export default function Hoy() {
         </div>
       )}
 
-      {!cargando && !error && visibles.length > 0 && (
-        <ul className="lista-gestiones" aria-live="polite">
-          {visibles.map((gestion) => (
-            <li key={gestion.id} className="tarjeta-gestion">
-              <div className="encabezado-gestion">
-                <h2>{gestion.nombre}</h2>
-                <span className={`insignia insignia-${gestion.situacion.toLowerCase()}`}>
-                  {etiquetaSituacion(gestion.situacion)}
-                </span>
-              </div>
-              <p>{gestion.eventoNombre}</p>
-              <p>Horas estimadas: <strong>{gestion.horas_estimadas}</strong></p>
-              <p>Plazo: <strong>{gestion.fecha_objetivo}</strong></p>
-              <Link to={`/evento/${gestion.eventoId}`}>Ver evento</Link>
-            </li>
+      {!cargando && !error && gruposVisibles.length > 0 && (
+        <div aria-live="polite">
+          {gruposVisibles.map((grupo) => (
+            <section key={grupo.id} className="grupo-prioridad" aria-labelledby={`grupo-${grupo.id}`}>
+              <h2 id={`grupo-${grupo.id}`}>{grupo.titulo}</h2>
+              <ul className="lista-gestiones">
+                {grupo.gestiones.map((gestion) => (
+                  <li key={gestion.id} className="tarjeta-gestion">
+                    <div className="encabezado-gestion">
+                      <h3>{gestion.nombre}</h3>
+                      <span className={`insignia insignia-${gestion.situacion.toLowerCase()}`}>
+                        {etiquetaSituacion(gestion.situacion)}
+                      </span>
+                    </div>
+                    <p>{gestion.eventoNombre}</p>
+                    <p>Horas estimadas: <strong>{gestion.horas_estimadas}</strong></p>
+                    <p>Plazo: <strong>{gestion.fecha_objetivo}</strong></p>
+                    <Link to={`/evento/${gestion.eventoId}`}>Ver evento</Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       )}
     </section>
   )

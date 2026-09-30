@@ -201,6 +201,8 @@ h3 { margin: 0; font-size: 1.05rem; }
 .centro-accion {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-top: 0.75rem;
 }
 .acciones-edicion { justify-content: space-between; margin-top: 0.5rem; }
@@ -284,13 +286,19 @@ h3 { margin: 0; font-size: 1.05rem; }
 }
 
 .lista-eventos, .lista-gestiones { list-style: none; padding: 0; margin: 1rem 0; }
+.lista-eventos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  gap: 0.9rem;
+}
 .tarjeta-evento {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.1rem;
-  margin-bottom: 0.8rem;
+  margin: 0;
+  height: 100%;
 }
 .tarjeta-evento h2 { margin-bottom: 0.25rem; }
 .tarjeta-evento p { margin: 0.1rem 0; color: var(--texto-suave); }
@@ -349,8 +357,24 @@ h3 { margin: 0; font-size: 1.05rem; }
 .insignia-vencida { background: #fee2e2; color: #b91c1c; }
 .insignia-ejecutada { background: #d1fae5; color: #047857; }
 .insignia-para_hoy { background: #fef3c7; color: #92400e; }
+.insignia-proxima { background: #e0e7ff; color: #3730a3; }
+
+.regla-prioridad {
+  margin: 0.75rem 0 1rem;
+  padding: 0.9rem 1rem;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-left: 4px solid var(--acento);
+  border-radius: var(--radio);
+}
+.regla-prioridad p { margin: 0.15rem 0; }
+
+.grupo-prioridad { margin-top: 1.15rem; }
+.grupo-prioridad h2 { margin-bottom: 0.15rem; }
+.grupo-prioridad .lista-gestiones { margin-top: 0.55rem; }
 
 .formulario-anidado { margin-top: 1.2rem; padding: 1rem; border: 1px solid var(--borde); border-radius: var(--radio); background: #fff; }
+.mensaje-centrado { text-align: center; margin: 0.75rem 0 0; }
 
 .modal-fondo {
   position: fixed;
@@ -438,9 +462,10 @@ h3 { margin: 0; font-size: 1.05rem; }
 
 @media (max-width: 800px) {
   .app { flex-direction: column; }
-  .barra-lateral { width: auto; }
+  .barra-lateral { width: auto; min-height: 0; }
   .barra-lateral nav { flex-direction: row; flex-wrap: wrap; }
   .lienzo, main { padding: 0.85rem; }
-  .rejilla, .rejilla-ficha { grid-template-columns: 1fr; }
+  .rejilla, .rejilla-ficha, .lista-eventos { grid-template-columns: 1fr; }
   .tarjeta-evento, .encabezado-detalle, .acciones-edicion { align-items: stretch; flex-direction: column; }
+  .tarjeta-evento .boton { width: 100%; }
 }
