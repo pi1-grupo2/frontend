@@ -379,7 +379,6 @@ export default function EventoDetalle() {
             <div className="icono-estado" aria-hidden="true">📖</div>
             <h2>Aún no tienes gestiones planificadas</h2>
             <p>Comienza agregando subtareas clave como salón, sonido o catering.</p>
-            <a className="boton boton-primario" href="#nueva-gestion">+ Agregar gestión logística</a>
           </div>
         ) : (
           <ul className="lista-gestiones">
