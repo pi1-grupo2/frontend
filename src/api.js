@@ -1,3 +1,5 @@
+import { cerrarSesion, leerSesion } from './sesion'
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api'
 
 export class ErrorApi extends Error {
@@ -9,14 +11,21 @@ export class ErrorApi extends Error {
 }
 
 async function solicitar(ruta, opciones = {}) {
+  const { sinToken = false, ...resto } = opciones
+  const encabezados = {
+    'Content-Type': 'application/json',
+    ...(resto.headers ?? {}),
+  }
+  const sesion = leerSesion()
+  if (!sinToken && sesion?.token) {
+    encabezados.Authorization = `Bearer ${sesion.token}`
+  }
+
   let respuesta
   try {
     respuesta = await fetch(`${API_URL}${ruta}`, {
-      ...opciones,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(opciones.headers ?? {}),
-      },
+      ...resto,
+      headers: encabezados,
     })
   } catch {
     throw new ErrorApi(
@@ -33,9 +42,15 @@ async function solicitar(ruta, opciones = {}) {
   const texto = await respuesta.text()
   const datos = texto ? JSON.parse(texto) : null
 
+  if (respuesta.status === 401 && !sinToken) {
+    cerrarSesion()
+  }
+
   if (!respuesta.ok) {
     throw new ErrorApi(
-      'Tuvimos un inconveniente al conectar con el servidor. Tus datos no se perdieron; intenta nuevamente.',
+      respuesta.status === 401 && sinToken
+        ? 'Credenciales inválidas'
+        : 'Tuvimos un inconveniente al conectar con el servidor. Tus datos no se perdieron; intenta nuevamente.',
       respuesta.status,
       datos,
     )
@@ -45,7 +60,23 @@ async function solicitar(ruta, opciones = {}) {
 }
 
 export function consultarSalud() {
-  return solicitar('/health/')
+  return solicitar('/health/', { sinToken: true })
+}
+
+export function iniciarSesion(correo, password) {
+  return solicitar('/auth/login/', {
+    method: 'POST',
+    sinToken: true,
+    body: JSON.stringify({ correo, password }),
+  })
+}
+
+export function obtenerSesion() {
+  return solicitar('/auth/sesion/')
+}
+
+export function cerrarSesionRemota() {
+  return solicitar('/auth/sesion/', { method: 'DELETE' })
 }
 
 export function obtenerOrganizador() {
