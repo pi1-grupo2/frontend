@@ -56,10 +56,15 @@ export default function FormularioSubtarea({ eventoId, fechaEvento, alCrear }) {
 
   if (!abierto) {
     return (
-      <div className="centro-accion" id="nueva-gestion">
-        <button type="button" className="boton boton-primario" onClick={() => setAbierto(true)}>
-          + Agregar gestión
-        </button>
+      <div id="nueva-gestion">
+        {isSuccess && (
+          <p className="ayuda-campo mensaje-centrado" role="status">La gestión se agregó correctamente.</p>
+        )}
+        <div className="centro-accion">
+          <button type="button" className="boton boton-primario" onClick={() => setAbierto(true)}>
+            Agregar gestión logística
+          </button>
+        </div>
       </div>
     )
   }
