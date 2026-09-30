@@ -30,7 +30,7 @@ export function ProveedorSesion({ children }) {
       })
       .catch((error) => {
         if (!vigente) return
-        if (error.status === 401) {
+        if (error.status === 401 || error.status === 403) {
           cerrarSesion()
           setSesion(null)
         }
@@ -41,6 +41,22 @@ export function ProveedorSesion({ children }) {
 
     return () => {
       vigente = false
+    }
+  }, [])
+
+  useEffect(() => {
+    function revisar() {
+      if (!sessionStorage.getItem('eventflow.sesion')) return
+      if (!leerSesion()) {
+        cerrarSesion()
+        setSesion(null)
+      }
+    }
+    window.addEventListener('focus', revisar)
+    const reloj = window.setInterval(revisar, 30000)
+    return () => {
+      window.removeEventListener('focus', revisar)
+      window.clearInterval(reloj)
     }
   }, [])
 

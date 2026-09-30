@@ -42,7 +42,7 @@ async function solicitar(ruta, opciones = {}) {
   const texto = await respuesta.text()
   const datos = texto ? JSON.parse(texto) : null
 
-  if (respuesta.status === 401 && !sinToken) {
+  if ((respuesta.status === 401 || respuesta.status === 403) && !sinToken && sesion?.token) {
     cerrarSesion()
   }
 
