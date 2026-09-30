@@ -42,7 +42,7 @@ export default function Eventos() {
   useEffect(() => cargar(), [cargar])
 
   return (
-    <section className="pagina pagina-amplia">
+    <section className="pagina">
       {toast && <Toast titulo={toast.titulo} mensaje={toast.mensaje} onClose={() => setToast(null)} />}
       <header className="encabezado-pagina">
         <h1>Mis Eventos</h1>

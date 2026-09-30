@@ -31,7 +31,7 @@ export default function Crear() {
   const [hora, setHora] = useState('')
   const [lugar, setLugar] = useState('')
   const [limite, setLimite] = useState(6)
-  const [subtareas, setSubtareas] = useState([nuevaSubtarea()])
+  const [subtareas, setSubtareas] = useState([])
   const [errores, setErrores] = useState({})
   const [erroresSubtareas, setErroresSubtareas] = useState({})
   const [avisoPlan, setAvisoPlan] = useState('')
@@ -430,13 +430,15 @@ export default function Crear() {
             )
           })}
 
-          <button
-            type="button"
-            className="boton boton-secundario"
-            onClick={() => setSubtareas((anteriores) => [...anteriores, nuevaSubtarea()])}
-          >
-            + Agregar gestión
-          </button>
+          <div className="centro-accion">
+            <button
+              type="button"
+              className="boton boton-primario"
+              onClick={() => setSubtareas((anteriores) => [...anteriores, nuevaSubtarea()])}
+            >
+              + Agregar gestión
+            </button>
+          </div>
         </fieldset>
 
         <div className="acciones-formulario">
