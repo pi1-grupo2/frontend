@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { cerrarSesionRemota } from './api'
 import { ProveedorSesion, useSesion } from './components/ProveedorSesion'
@@ -6,11 +7,12 @@ import Crear from './pages/Crear.jsx'
 import Eventos from './pages/Eventos.jsx'
 import EventoDetalle from './pages/EventoDetalle.jsx'
 import Login from './pages/Login.jsx'
-import { cerrarSesion } from './sesion'
+import { cerrarSesion, tomarAviso } from './sesion'
 
 function RutaProtegida() {
   const { sesion, comprobando } = useSesion()
   const ubicacion = useLocation()
+  const avisoRedireccion = useRef(null)
 
   if (comprobando) {
     return (
@@ -21,7 +23,14 @@ function RutaProtegida() {
   }
 
   if (!sesion) {
-    return <Navigate to="/login" replace state={{ desde: ubicacion.pathname }} />
+    if (!avisoRedireccion.current) avisoRedireccion.current = tomarAviso() || 'protegida'
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ desde: ubicacion.pathname, aviso: avisoRedireccion.current }}
+      />
+    )
   }
 
   return <Outlet />
@@ -38,7 +47,7 @@ function Shell() {
       // Si la API no responde, la sesión de este navegador se cierra igual.
     }
     cerrarSesion()
-    navigate('/login', { replace: true })
+    navigate('/login', { replace: true, state: { aviso: 'cerrada' } })
   }
 
   return (
