@@ -1,4 +1,4 @@
-import { cerrarSesion, leerSesion } from './sesion'
+import { cerrarSesion, leerSesion, marcarAviso } from './sesion'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api'
 
@@ -43,6 +43,7 @@ async function solicitar(ruta, opciones = {}) {
   const datos = texto ? JSON.parse(texto) : null
 
   if ((respuesta.status === 401 || respuesta.status === 403) && !sinToken && sesion?.token) {
+    marcarAviso('expirada')
     cerrarSesion()
   }
 
@@ -68,6 +69,14 @@ export function iniciarSesion(correo, password) {
     method: 'POST',
     sinToken: true,
     body: JSON.stringify({ correo, password }),
+  })
+}
+
+export function crearCuenta(nombre, correo, password) {
+  return solicitar('/auth/registro/', {
+    method: 'POST',
+    sinToken: true,
+    body: JSON.stringify({ nombre, correo, password }),
   })
 }
 

@@ -1,4 +1,15 @@
 const CLAVE = 'eventflow.sesion'
+const CLAVE_AVISO = 'eventflow.aviso'
+
+export function marcarAviso(motivo) {
+  sessionStorage.setItem(CLAVE_AVISO, motivo)
+}
+
+export function tomarAviso() {
+  const aviso = sessionStorage.getItem(CLAVE_AVISO)
+  sessionStorage.removeItem(CLAVE_AVISO)
+  return aviso
+}
 
 function vigente(datos) {
   if (!datos?.token) return false
@@ -12,6 +23,7 @@ export function leerSesion() {
     if (!texto) return null
     const datos = JSON.parse(texto)
     if (!vigente(datos)) {
+      marcarAviso('expirada')
       sessionStorage.removeItem(CLAVE)
       return null
     }

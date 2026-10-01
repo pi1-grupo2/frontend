@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { listarEventos, listarSubtareas } from '../api'
+import Toast from '../components/Toast'
 import { etiquetaSituacion } from '../formato'
 
 const GRUPOS = [
@@ -24,6 +25,8 @@ function ordenarGestiones(lista) {
 }
 
 export default function Hoy() {
+  const ubicacion = useLocation()
+  const [cuentaCreada, setCuentaCreada] = useState(Boolean(ubicacion.state?.cuentaCreada))
   const [eventos, setEventos] = useState([])
   const [gestiones, setGestiones] = useState([])
   const [filtroEvento, setFiltroEvento] = useState('')
@@ -88,6 +91,7 @@ export default function Hoy() {
 
   return (
     <section className="pagina">
+      {cuentaCreada && <Toast titulo="Cuenta creada." mensaje="" onClose={() => setCuentaCreada(false)} />}
       <h1>Hoy</h1>
       <p className="intro">Tus gestiones pendientes, ordenadas por prioridad.</p>
 

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { obtenerSesion } from '../api'
-import { cerrarSesion, leerSesion } from '../sesion'
+import { cerrarSesion, leerSesion, marcarAviso } from '../sesion'
 
 const ContextoSesion = createContext(null)
 
@@ -31,6 +31,7 @@ export function ProveedorSesion({ children }) {
       .catch((error) => {
         if (!vigente) return
         if (error.status === 401 || error.status === 403) {
+          marcarAviso('expirada')
           cerrarSesion()
           setSesion(null)
         }
