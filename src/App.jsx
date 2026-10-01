@@ -7,6 +7,7 @@ import Crear from './pages/Crear.jsx'
 import Eventos from './pages/Eventos.jsx'
 import EventoDetalle from './pages/EventoDetalle.jsx'
 import Login from './pages/Login.jsx'
+import Registro from './pages/Registro.jsx'
 import { cerrarSesion, tomarAviso } from './sesion'
 
 function RutaProtegida() {
@@ -77,6 +78,7 @@ export default function App() {
     <ProveedorSesion>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
         <Route element={<RutaProtegida />}>
           <Route element={<Shell />}>
             <Route path="/" element={<Navigate to="/eventos" replace />} />

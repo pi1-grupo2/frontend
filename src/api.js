@@ -72,6 +72,14 @@ export function iniciarSesion(correo, password) {
   })
 }
 
+export function crearCuenta(nombre, correo, password) {
+  return solicitar('/auth/registro/', {
+    method: 'POST',
+    sinToken: true,
+    body: JSON.stringify({ nombre, correo, password }),
+  })
+}
+
 export function obtenerSesion() {
   return solicitar('/auth/sesion/')
 }

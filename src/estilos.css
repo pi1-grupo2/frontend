@@ -403,6 +403,7 @@ h3 { margin: 0; font-size: 1.05rem; }
   z-index: 40;
 }
 .toast p { margin: 0.25rem 0 0; color: var(--texto-suave); }
+.toast p:empty { display: none; }
 
 .esqueleto { background: linear-gradient(90deg, #e5e7eb, #f8fafc, #e5e7eb); background-size: 200% 100%; animation: brillo 1.2s infinite; border-radius: 0.6rem; }
 .esqueleto-bloque { height: 8rem; }
