@@ -357,14 +357,41 @@ h3 { margin: 0; font-size: 1.05rem; }
   background: #ede9fe;
   color: #5b21b6;
 }
-.insignia-vencida { background: #fee2e2; color: #b91c1c; }
+.insignia-vencida { background: #ffedd5; color: #9a3412; }
 .insignia-ejecutada { background: #d1fae5; color: #047857; }
 .insignia-para_hoy { background: #fef3c7; color: #92400e; }
 .insignia-proxima { background: #e0e7ff; color: #3730a3; }
+.insignia-pospuesta { background: #f1f5f9; color: #334155; }
 
 .grupo-prioridad { margin-top: 1.15rem; }
-.grupo-prioridad h2 { margin-bottom: 0.15rem; }
+.grupo-primer-plano h2 { margin-bottom: 0.15rem; font-size: 1.25rem; font-weight: 700; }
+.grupo-segundo-plano { margin-top: 2.4rem; }
+.grupo-segundo-plano h2 { margin-bottom: 0.15rem; color: #64748b; font-weight: 650; }
 .grupo-prioridad .lista-gestiones { margin-top: 0.55rem; }
+.grupo-vencida .tarjeta-gestion { border-left: 4px solid #c2410c; }
+.grupo-para_hoy .tarjeta-gestion { border-left: 4px solid #334155; }
+.tarjeta-compacta { box-shadow: none; }
+.fecha-gestion { margin: 0 0 0.35rem; font-weight: 700; }
+.grupo-vencida .fecha-gestion { color: #9a3412; }
+.apoyo-grupo { color: #64748b; margin: 0.35rem 0 0; }
+.linea-resultado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0.4rem 0 0;
+}
+.selector-activo { border: 2px solid var(--acento) !important; }
+.regla-orden { margin: 0.4rem 0 1rem; }
+.panel-regla {
+  margin-top: 0.6rem;
+  padding: 0.9rem 1rem;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  border-radius: var(--radio);
+}
+.panel-regla p { margin: 0.35rem 0 0.8rem; }
+.esqueletos-hoy { display: flex; flex-direction: column; gap: 0.8rem; }
 
 .formulario-anidado { margin-top: 1.2rem; padding: 1rem; border: 1px solid var(--borde); border-radius: var(--radio); background: #fff; }
 .mensaje-centrado { text-align: center; margin: 0.75rem 0 0; }
