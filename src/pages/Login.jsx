@@ -1,16 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { iniciarSesion } from '../api'
 import { useSesion } from '../components/ProveedorSesion'
+import Toast from '../components/Toast'
 import { guardarSesion } from '../sesion'
 
+// Avisos que se quedan en pantalla: explican por qué el usuario terminó aquí sin pedirlo.
+// El cierre de sesión no va en esta lista. Lo pidió el usuario, así que se confirma con un toast.
 const AVISOS = {
-  protegida: {
-    titulo: 'Para ver esta página es necesario iniciar sesión.',
-  },
-  cerrada: {
-    titulo: 'Sesión cerrada.',
-  },
   expirada: {
     titulo: 'La sesión expiró.',
     apoyo: 'Iniciar sesión de nuevo para continuar.',
@@ -36,6 +33,9 @@ export default function Login() {
     ? ubicacion.state.desde
     : '/hoy'
   const aviso = AVISOS[ubicacion.state?.aviso]
+  const [sesionCerrada, setSesionCerrada] = useState(ubicacion.state?.aviso === 'cerrada')
+  // useCallback evita que el temporizador del toast se reinicie cada vez que se escribe en el formulario.
+  const ocultarSesionCerrada = useCallback(() => setSesionCerrada(false), [])
   const correoRef = useRef(null)
   const passwordRef = useRef(null)
   const [correo, setCorreo] = useState('')
@@ -47,6 +47,14 @@ export default function Login() {
   useEffect(() => {
     if (!comprobando && sesion) navigate(destino, { replace: true })
   }, [comprobando, sesion, destino, navigate])
+
+  // El motivo "cerrada" viaja en el historial del navegador. Se borra al llegar,
+  // para que la confirmación no vuelva a salir al recargar la página.
+  useEffect(() => {
+    if (ubicacion.state?.aviso === 'cerrada') {
+      navigate('/login', { replace: true, state: null })
+    }
+  }, [ubicacion.state, navigate])
 
   async function enviar(evento) {
     evento.preventDefault()
@@ -83,6 +91,7 @@ export default function Login() {
 
   return (
     <div className="pantalla-login">
+      {sesionCerrada && <Toast titulo="Sesión cerrada." mensaje="" onClose={ocultarSesionCerrada} />}
       <form className="tarjeta-login formulario" onSubmit={enviar} noValidate>
         <p className="marca marca-login"><span aria-hidden="true">⚡</span> EventFlow</p>
         <h1>Iniciar sesión</h1>

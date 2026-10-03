@@ -58,9 +58,9 @@ export default function FormularioSubtarea({ eventoId, fechaEvento, alCrear }) {
     return (
       <div id="nueva-gestion">
         {isSuccess && (
-          <p className="ayuda-campo mensaje-centrado" role="status">La gestión se agregó correctamente.</p>
+          <p className="ayuda-campo mensaje-accion" role="status">La gestión se agregó correctamente.</p>
         )}
-        <div className="centro-accion">
+        <div className="fila-accion">
           <button type="button" className="boton boton-primario" onClick={() => setAbierto(true)}>
             Agregar gestión logística
           </button>
@@ -126,13 +126,13 @@ export default function FormularioSubtarea({ eventoId, fechaEvento, alCrear }) {
           {errores.fechaObjetivo && <p className="error-campo" role="alert">{errores.fechaObjetivo}</p>}
         </div>
       </div>
-      <div className="centro-accion">
-        <button type="button" className="boton boton-secundario" onClick={() => setAbierto(false)}>
-          Cancelar
-        </button>
+      <div className="fila-accion">
         <button type="submit" className="boton boton-primario" disabled={isLoading}>
           {isLoading && <span className="spinner" aria-hidden="true" />}
           {isLoading ? 'Guardando...' : 'Guardar gestión'}
+        </button>
+        <button type="button" className="boton boton-secundario" onClick={() => setAbierto(false)}>
+          Cancelar
         </button>
       </div>
     </form>

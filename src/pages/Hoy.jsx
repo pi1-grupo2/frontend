@@ -22,6 +22,14 @@ const VACIO_FILTRO = {
 }
 const REGLA = 'Primero las vencidas, luego las de hoy y las de los próximos 7 días. En cada grupo va arriba la de fecha y hora más temprana. Si coinciden, la de menos horas estimadas.'
 
+// A qué grupo de /hoy pertenece una gestión. Lo usan el filtro por estado y el armado
+// de los grupos, para que los dos clasifiquen igual.
+function grupoDe(gestion, hoy) {
+  if (gestion.fecha_objetivo < hoy) return 'VENCIDA'
+  if (gestion.fecha_objetivo === hoy) return 'PARA_HOY'
+  return 'PROXIMA'
+}
+
 function hoyBogota() {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Bogota',
@@ -151,17 +159,15 @@ export default function Hoy() {
   const visibles = useMemo(() => {
     return enVentana.filter((gestion) => {
       if (filtroEvento && String(gestion.eventoId) !== filtroEvento) return false
-      if (filtroEstado && (gestion.estado ?? 'PENDIENTE') !== filtroEstado) return false
+      if (filtroEstado && grupoDe(gestion, hoy) !== filtroEstado) return false
       return true
     })
-  }, [enVentana, filtroEvento, filtroEstado])
+  }, [enVentana, filtroEvento, filtroEstado, hoy])
 
   const grupos = useMemo(() => {
     const porGrupo = { VENCIDA: [], PARA_HOY: [], PROXIMA: [] }
     visibles.forEach((gestion) => {
-      if (gestion.fecha_objetivo < hoy) porGrupo.VENCIDA.push(gestion)
-      else if (gestion.fecha_objetivo === hoy) porGrupo.PARA_HOY.push(gestion)
-      else porGrupo.PROXIMA.push(gestion)
+      porGrupo[grupoDe(gestion, hoy)].push(gestion)
     })
     const proximas = porGrupo.PROXIMA
     porGrupo.PROXIMA = proximas.slice(0, 20)
@@ -174,6 +180,9 @@ export default function Hoy() {
   const totalVisible = ORDEN_GRUPOS.reduce((suma, id) => suma + grupos.listas[id].length, 0)
   const hayDatos = enVentana.length > 0
   const mostrarGrupos = hayDatos && (!filtrosActivos || totalVisible > 0)
+  // Con filtro por estado solo se muestra el grupo elegido. Los otros dos quedarían vacíos
+  // repitiendo lo que el usuario acaba de pedir.
+  const gruposEnPantalla = filtroEstado ? [filtroEstado] : ORDEN_GRUPOS
 
   function limpiarFiltros() {
     setFiltroEvento('')
@@ -271,9 +280,12 @@ export default function Hoy() {
               value={filtroEstado}
               onChange={(evento) => setFiltroEstado(evento.target.value)}
             >
+              {/* Solo estados que el usuario puede producir hoy. "Pospuestas" regresa
+                  cuando exista la acción de posponer (US-09, Sprint 4). */}
               <option value="">Todos</option>
-              <option value="PENDIENTE">Pendientes</option>
-              <option value="POSPUESTA">Pospuestas</option>
+              <option value="VENCIDA">Vencidas</option>
+              <option value="PARA_HOY">Para hoy</option>
+              <option value="PROXIMA">Próximas</option>
             </select>
           </div>
         </form>
@@ -302,7 +314,7 @@ export default function Hoy() {
 
       {mostrarGrupos && (
         <div>
-          {ORDEN_GRUPOS.map((id) => {
+          {gruposEnPantalla.map((id) => {
             const lista = grupos.listas[id]
             return (
               <section

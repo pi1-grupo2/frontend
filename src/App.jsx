@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useMatch, useNavigate } from 'react-router-dom'
 import { cerrarSesionRemota } from './api'
 import { ProveedorSesion, useSesion } from './components/ProveedorSesion'
 import Hoy from './pages/Hoy.jsx'
@@ -24,7 +24,8 @@ function RutaProtegida() {
   }
 
   if (!sesion) {
-    if (!avisoRedireccion.current) avisoRedireccion.current = tomarAviso() || 'protegida'
+    // Solo hay aviso cuando la sesión se cerró o expiró. Llegar sin sesión no es un error del usuario.
+    if (!avisoRedireccion.current) avisoRedireccion.current = tomarAviso()
     return (
       <Navigate
         to="/login"
@@ -35,6 +36,16 @@ function RutaProtegida() {
   }
 
   return <Outlet />
+}
+
+// "Mis eventos" también se marca dentro del detalle de un evento, que es parte de esa sección.
+// NavLink solo se activa con su propia ruta, así que este enlace se marca a mano.
+// En la lista es la página actual ("page"); en el detalle es la sección actual ("true").
+function EnlaceMisEventos() {
+  const enLista = useMatch('/eventos')
+  const enDetalle = useMatch('/evento/:id')
+  const actual = enLista ? 'page' : enDetalle ? 'true' : undefined
+  return <Link to="/eventos" aria-current={actual}>Mis eventos</Link>
 }
 
 function Shell() {
@@ -59,7 +70,7 @@ function Shell() {
         <nav aria-label="Navegación principal">
           <NavLink to="/hoy">Hoy</NavLink>
           <NavLink to="/crear">+ Crear evento</NavLink>
-          <NavLink to="/eventos">Mis eventos</NavLink>
+          <EnlaceMisEventos />
         </nav>
         <p className="sesion-usuario">{sesion?.organizador?.nombre}</p>
         <button type="button" className="boton-salir" onClick={salir}>Cerrar sesión</button>
@@ -81,7 +92,8 @@ export default function App() {
         <Route path="/registro" element={<Registro />} />
         <Route element={<RutaProtegida />}>
           <Route element={<Shell />}>
-            <Route path="/" element={<Navigate to="/eventos" replace />} />
+            {/* La raíz lleva a Hoy: es la vista de lo urgente y la primera del menú. */}
+            <Route path="/" element={<Navigate to="/hoy" replace />} />
             <Route path="/hoy" element={<Hoy />} />
             <Route path="/crear" element={<Crear />} />
             <Route path="/eventos" element={<Eventos />} />
