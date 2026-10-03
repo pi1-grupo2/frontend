@@ -15,6 +15,8 @@ export default function ModalConfirmacion({
   useEffect(() => {
     if (!abierto) return undefined
 
+    // El foco inicial queda en Cancelar aunque no sea el primer botón:
+    // en una confirmación de borrado, la opción segura debe ser la que responde a Enter.
     cancelarRef.current?.focus()
 
     function alTeclado(evento) {
@@ -26,8 +28,8 @@ export default function ModalConfirmacion({
 
       if (evento.key !== 'Tab') return
 
-      const primero = cancelarRef.current
-      const ultimo = confirmarRef.current
+      const primero = confirmarRef.current
+      const ultimo = cancelarRef.current
       if (!primero || !ultimo) return
 
       if (evento.shiftKey && document.activeElement === primero) {
@@ -59,15 +61,6 @@ export default function ModalConfirmacion({
         <p id="modal-mensaje">{mensaje}</p>
         <div className="modal-acciones">
           <button
-            ref={cancelarRef}
-            type="button"
-            className="boton boton-secundario"
-            onClick={onCancelar}
-            disabled={cargando}
-          >
-            Cancelar
-          </button>
-          <button
             ref={confirmarRef}
             type="button"
             className="boton boton-peligro-solido"
@@ -75,6 +68,15 @@ export default function ModalConfirmacion({
             disabled={cargando}
           >
             {cargando ? 'Eliminando...' : textoConfirmar}
+          </button>
+          <button
+            ref={cancelarRef}
+            type="button"
+            className="boton boton-secundario"
+            onClick={onCancelar}
+            disabled={cargando}
+          >
+            Cancelar
           </button>
         </div>
       </div>

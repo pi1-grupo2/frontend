@@ -435,7 +435,7 @@ export default function Crear() {
             )
           })}
 
-          <div className="centro-accion">
+          <div className="fila-accion">
             <button
               type="button"
               className="boton boton-primario"
@@ -447,11 +447,11 @@ export default function Crear() {
         </fieldset>
 
         <div className="acciones-formulario">
-          <Link className="boton boton-secundario" to="/eventos">Cancelar</Link>
           <button type="submit" className="boton boton-primario" disabled={isLoading}>
             {isLoading && <span className="spinner" aria-hidden="true" />}
-            {isLoading ? 'Guardando...' : 'Crear evento y plan'}
+            {isLoading ? 'Guardando...' : 'Crear evento'}
           </button>
+          <Link className="boton boton-secundario" to="/eventos">Cancelar</Link>
         </div>
       </form>
     </section>

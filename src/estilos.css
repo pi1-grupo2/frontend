@@ -193,22 +193,17 @@ h3 { margin: 0; font-size: 1.05rem; }
 .tarjeta-gestion { padding: 1rem; margin: 0.8rem 0; }
 .encabezado-gestion { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
 
-.acciones-formulario, .acciones-edicion, .modal-acciones {
+/* Las acciones van a la izquierda, en la misma línea donde empiezan las etiquetas y los campos.
+   En todas, la acción principal va primero y Cancelar después. */
+.acciones-formulario, .acciones-edicion, .modal-acciones, .fila-accion {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
-.centro-accion {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-}
+.fila-accion { margin-top: 0.75rem; }
 .acciones-edicion { justify-content: space-between; margin-top: 0.5rem; }
-.modal-acciones { justify-content: flex-end; }
 
 .boton {
   display: inline-flex;
@@ -394,7 +389,7 @@ h3 { margin: 0; font-size: 1.05rem; }
 .esqueletos-hoy { display: flex; flex-direction: column; gap: 0.8rem; }
 
 .formulario-anidado { margin-top: 1.2rem; padding: 1rem; border: 1px solid var(--borde); border-radius: var(--radio); background: #fff; }
-.mensaje-centrado { text-align: center; margin: 0.75rem 0 0; }
+.mensaje-accion { margin: 0.75rem 0 0; }
 
 .modal-fondo {
   position: fixed;
@@ -414,7 +409,6 @@ h3 { margin: 0; font-size: 1.05rem; }
 }
 .modal h2 { margin-bottom: 0.45rem; }
 .modal p { color: #475569; margin-top: 0; }
-.modal-acciones { justify-content: flex-end; }
 
 .toast {
   position: fixed;
