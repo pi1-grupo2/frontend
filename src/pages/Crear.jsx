@@ -8,6 +8,9 @@ import {
 } from '../api'
 import { TIPOS_EVENTO } from '../formato'
 
+// Un solo texto para la indicación y para el error del plan vacío.
+const PLAN_SIN_GESTIONES = 'Agrega al menos una gestión clave (salón, catering, invitaciones) con sus horas estimadas.'
+
 let claveSubtarea = 1
 
 function nuevaSubtarea() {
@@ -84,9 +87,7 @@ export default function Crear() {
     }
 
     if (subtareas.length === 0) {
-      setAvisoPlan(
-        'Agrega al menos una gestión clave (salón, catering, invitaciones) con sus horas estimadas.',
-      )
+      setAvisoPlan(PLAN_SIN_GESTIONES)
     } else {
       setAvisoPlan('')
     }
@@ -350,12 +351,16 @@ export default function Crear() {
             Las gestiones logísticas permiten calcular el esfuerzo total del evento.
           </p>
 
-          {avisoPlan && <p className="error-campo" role="alert">{avisoPlan}</p>}
-
+          {/* Sin gestiones se muestra un solo mensaje: la indicación antes de enviar, o el error
+              si ya se intentó guardar. Nunca los dos, porque dicen lo mismo. */}
           {subtareas.length === 0 && (
-            <div className="estado-vacio estado-vacio-compacto">
-              <p>Agrega al menos una gestión clave (salón, catering, invitaciones) con sus horas estimadas.</p>
-            </div>
+            avisoPlan ? (
+              <p className="error-campo" role="alert">{avisoPlan}</p>
+            ) : (
+              <div className="estado-vacio estado-vacio-compacto">
+                <p>{PLAN_SIN_GESTIONES}</p>
+              </div>
+            )
           )}
 
           {subtareas.map((subtarea, indice) => {
