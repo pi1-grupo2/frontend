@@ -8,6 +8,7 @@ import Eventos from './pages/Eventos.jsx'
 import EventoDetalle from './pages/EventoDetalle.jsx'
 import Login from './pages/Login.jsx'
 import Registro from './pages/Registro.jsx'
+import Configuracion from './pages/Configuracion.jsx'
 import { cerrarSesion, tomarAviso } from './sesion'
 
 function RutaProtegida() {
@@ -71,6 +72,7 @@ function Shell() {
           <NavLink to="/hoy">Hoy</NavLink>
           <NavLink to="/crear">+ Crear evento</NavLink>
           <EnlaceMisEventos />
+          <NavLink to="/configuracion">Configuración</NavLink>
         </nav>
         <p className="sesion-usuario">{sesion?.organizador?.nombre}</p>
         <button type="button" className="boton-salir" onClick={salir}>Cerrar sesión</button>
@@ -98,6 +100,7 @@ export default function App() {
             <Route path="/crear" element={<Crear />} />
             <Route path="/eventos" element={<Eventos />} />
             <Route path="/evento/:id" element={<EventoDetalle />} />
+            <Route path="/configuracion" element={<Configuracion />} />
             <Route path="/progreso" element={<Navigate to="/eventos" replace />} />
           </Route>
         </Route>
