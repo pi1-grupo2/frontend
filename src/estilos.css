@@ -74,7 +74,9 @@ body {
   font-weight: 500;
 }
 
-.barra-lateral a[aria-current="page"] {
+/* Cualquier valor de aria-current marca el enlace: "page" en la página actual
+   y "true" cuando se está en una página interna de esa sección. */
+.barra-lateral a[aria-current] {
   background: var(--acento);
   color: #fff;
   font-weight: 700;
@@ -105,6 +107,21 @@ h3 { margin: 0; font-size: 1.05rem; }
 
 .intro, .intro-seccion, .ayuda-campo { color: var(--texto-suave); }
 .intro { margin-top: 0; max-width: 40rem; }
+
+.ruta-navegacion { margin-bottom: 0.8rem; }
+.ruta-navegacion ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  color: var(--texto-suave);
+}
+.ruta-navegacion li + li::before { content: "/"; margin-right: 0.4rem; }
+/* El enlace va subrayado: no puede distinguirse del texto solo por el color. */
+.ruta-navegacion a { color: inherit; text-decoration: underline; }
+.ruta-navegacion [aria-current="page"] { color: var(--texto); font-weight: 600; }
 
 .enlace-volver, .enlace-boton {
   display: inline-flex;

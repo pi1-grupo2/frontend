@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useMatch, useNavigate } from 'react-router-dom'
 import { cerrarSesionRemota } from './api'
 import { ProveedorSesion, useSesion } from './components/ProveedorSesion'
 import Hoy from './pages/Hoy.jsx'
@@ -38,6 +38,16 @@ function RutaProtegida() {
   return <Outlet />
 }
 
+// "Mis eventos" también se marca dentro del detalle de un evento, que es parte de esa sección.
+// NavLink solo se activa con su propia ruta, así que este enlace se marca a mano.
+// En la lista es la página actual ("page"); en el detalle es la sección actual ("true").
+function EnlaceMisEventos() {
+  const enLista = useMatch('/eventos')
+  const enDetalle = useMatch('/evento/:id')
+  const actual = enLista ? 'page' : enDetalle ? 'true' : undefined
+  return <Link to="/eventos" aria-current={actual}>Mis eventos</Link>
+}
+
 function Shell() {
   const { sesion } = useSesion()
   const navigate = useNavigate()
@@ -60,7 +70,7 @@ function Shell() {
         <nav aria-label="Navegación principal">
           <NavLink to="/hoy">Hoy</NavLink>
           <NavLink to="/crear">+ Crear evento</NavLink>
-          <NavLink to="/eventos">Mis eventos</NavLink>
+          <EnlaceMisEventos />
         </nav>
         <p className="sesion-usuario">{sesion?.organizador?.nombre}</p>
         <button type="button" className="boton-salir" onClick={salir}>Cerrar sesión</button>

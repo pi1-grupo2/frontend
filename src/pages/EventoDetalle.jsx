@@ -205,9 +205,16 @@ export default function EventoDetalle() {
     <section className="pagina">
       {toast && <Toast titulo={toast.titulo} mensaje={toast.mensaje} onClose={() => setToast(null)} />}
 
-      {modo === 'ver' ? (
-        <Link className="enlace-volver" to="/eventos">← Volver a Mis eventos</Link>
-      ) : (
+      {/* Ruta de navegación: muestra dónde está el usuario, no de dónde viene.
+          A este detalle se llega desde Mis eventos y también desde Hoy. */}
+      <nav className="ruta-navegacion" aria-label="Ruta de navegación">
+        <ol>
+          <li><Link to="/eventos">Mis eventos</Link></li>
+          <li aria-current="page">{evento.nombre}</li>
+        </ol>
+      </nav>
+
+      {modo === 'editar' && (
         <button type="button" className="enlace-volver enlace-boton" onClick={() => setModo('ver')}>
           ← Cancelar edición
         </button>
