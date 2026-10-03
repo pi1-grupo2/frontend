@@ -42,12 +42,19 @@ body {
 
 .app { display: flex; min-height: 100vh; }
 
+/* La barra queda fija mientras el contenido se desplaza: el menú y "Cerrar sesión"
+   siempre están a la vista. Ocupa justo el alto de la ventana, no el de la página.
+   Si la ventana es muy baja, la barra tiene su propio scroll para alcanzar el botón. */
 .barra-lateral {
   width: 15.5rem;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
   background: var(--sidebar);
   color: #e2e8f0;
   padding: 1.5rem 1rem;
@@ -509,7 +516,9 @@ h3 { margin: 0; font-size: 1.05rem; }
 
 @media (max-width: 800px) {
   .app { flex-direction: column; }
-  .barra-lateral { width: auto; min-height: 0; }
+  /* En pantallas angostas la barra va arriba y se desplaza con la página:
+     fija ocuparía buena parte de una pantalla pequeña. */
+  .barra-lateral { width: auto; position: static; height: auto; overflow-y: visible; align-self: stretch; }
   .barra-lateral nav { flex-direction: row; flex-wrap: wrap; }
   .lienzo, main { padding: 0.85rem; }
   .rejilla, .rejilla-ficha, .lista-eventos { grid-template-columns: 1fr; }
