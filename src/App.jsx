@@ -24,7 +24,8 @@ function RutaProtegida() {
   }
 
   if (!sesion) {
-    if (!avisoRedireccion.current) avisoRedireccion.current = tomarAviso() || 'protegida'
+    // Solo hay aviso cuando la sesión se cerró o expiró. Llegar sin sesión no es un error del usuario.
+    if (!avisoRedireccion.current) avisoRedireccion.current = tomarAviso()
     return (
       <Navigate
         to="/login"
