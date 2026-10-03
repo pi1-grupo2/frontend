@@ -393,7 +393,7 @@ export default function EventoDetalle() {
                 <p>Horas estimadas: <strong>{subtarea.horas_estimadas}</strong></p>
                 <p>Plazo: <strong>{subtarea.fecha_objetivo}</strong></p>
                 {subtarea.nota_posposicion && <p>{subtarea.nota_posposicion}</p>}
-                <div className="acciones-formulario">
+                <div className="acciones-gestion">
                   {subtarea.estado !== 'EJECUTADA' && (
                     <button type="button" className="boton boton-secundario" onClick={() => marcarEjecutarSeguro(subtarea)}>
                       Marcar como ejecutada

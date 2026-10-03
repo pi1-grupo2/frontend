@@ -204,6 +204,16 @@ h3 { margin: 0; font-size: 1.05rem; }
 }
 .fila-accion { margin-top: 0.75rem; }
 .acciones-edicion { justify-content: space-between; margin-top: 0.5rem; }
+/* Acciones de una gestión: fila al pie de la tarjeta, a la derecha. Quedan separadas de los datos,
+   que se leen de izquierda a derecha, y siempre en el mismo lugar de cada tarjeta. */
+.acciones-gestion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
 
 .boton {
   display: inline-flex;
