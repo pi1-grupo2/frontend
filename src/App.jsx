@@ -92,7 +92,8 @@ export default function App() {
         <Route path="/registro" element={<Registro />} />
         <Route element={<RutaProtegida />}>
           <Route element={<Shell />}>
-            <Route path="/" element={<Navigate to="/eventos" replace />} />
+            {/* La raíz lleva a Hoy: es la vista de lo urgente y la primera del menú. */}
+            <Route path="/" element={<Navigate to="/hoy" replace />} />
             <Route path="/hoy" element={<Hoy />} />
             <Route path="/crear" element={<Crear />} />
             <Route path="/eventos" element={<Eventos />} />
