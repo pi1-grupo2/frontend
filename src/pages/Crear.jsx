@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  actualizarOrganizador,
   crearEvento,
   crearSubtarea,
   obtenerOrganizador,
@@ -33,7 +32,6 @@ export default function Crear() {
   const [fecha, setFecha] = useState('')
   const [hora, setHora] = useState('')
   const [lugar, setLugar] = useState('')
-  const [limite, setLimite] = useState(6)
   const [subtareas, setSubtareas] = useState([])
   const [errores, setErrores] = useState({})
   const [erroresSubtareas, setErroresSubtareas] = useState({})
@@ -41,20 +39,6 @@ export default function Crear() {
   const [isLoading, setIsLoading] = useState(false)
   const [hasError, setHasError] = useState(false)
   const [eventoIdParcial, setEventoIdParcial] = useState(null)
-
-  useEffect(() => {
-    let vigente = true
-    obtenerOrganizador()
-      .then((datos) => {
-        if (vigente && datos?.limite_diario_horas != null) {
-          setLimite(Number(datos.limite_diario_horas))
-        }
-      })
-      .catch(() => {})
-    return () => {
-      vigente = false
-    }
-  }, [])
 
   function validar() {
     const nuevosErrores = {}
@@ -81,9 +65,6 @@ export default function Crear() {
     }
     if (!lugar.trim()) {
       nuevosErrores.lugar = 'Este campo es obligatorio para planificar el evento.'
-    }
-    if (limite === '' || Number(limite) < 1 || Number(limite) > 16) {
-      nuevosErrores.limite = 'Las horas de gestión deben ser un valor entre 1 y 16.'
     }
 
     if (subtareas.length === 0) {
@@ -146,9 +127,6 @@ export default function Crear() {
 
     try {
       const organizador = await obtenerOrganizador()
-      if (Number(organizador.limite_diario_horas) !== Number(limite)) {
-        await actualizarOrganizador({ limite_diario_horas: Number(limite) })
-      }
 
       let eventoId = eventoIdParcial
       if (!eventoId) {
@@ -276,7 +254,7 @@ export default function Crear() {
         </fieldset>
 
         <fieldset>
-          <legend>2. Coordenadas operativas y capacidad</legend>
+          <legend>2. Coordenadas operativas</legend>
           <div className="rejilla">
             <div className="campo">
               <label htmlFor="fecha">
@@ -321,27 +299,6 @@ export default function Crear() {
               aria-describedby={errores.lugar ? 'error-lugar' : undefined}
             />
             {errores.lugar && <p id="error-lugar" className="error-campo" role="alert">{errores.lugar}</p>}
-          </div>
-
-          <div className="campo campo-estrecho">
-            <label htmlFor="limite">
-              Límite diario de horas <span className="obligatorio" aria-hidden="true">*</span>
-            </label>
-            <small id="ayuda-limite" className="ayuda-campo">
-              Horas máximas de preparación por día. Recomendado: 6. Debe estar entre 1 y 16.
-            </small>
-            <input
-              id="limite"
-              type="number"
-              min="1"
-              max="16"
-              step="1"
-              value={limite}
-              onChange={(e) => setLimite(e.target.value)}
-              aria-invalid={Boolean(errores.limite)}
-              aria-describedby={errores.limite ? 'ayuda-limite error-limite' : 'ayuda-limite'}
-            />
-            {errores.limite && <p id="error-limite" className="error-campo" role="alert">{errores.limite}</p>}
           </div>
         </fieldset>
 
