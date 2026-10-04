@@ -58,3 +58,27 @@ const FORMATO_HORAS = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 1 
 export function formatearHoras(valor) {
   return `${FORMATO_HORAS.format(Number(valor))} h`
 }
+
+// Fecha de hoy (AAAA-MM-DD) en la zona horaria de la operación. Todas las vistas comparan contra esta.
+export function hoyBogota() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Bogota',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date())
+}
+
+const FORMATO_FECHA = new Intl.DateTimeFormat('es-CO', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+})
+
+// "2026-10-09" se muestra como "9 de octubre de 2026". Se arma en UTC para que la fecha no se corra un día.
+export function formatearFecha(iso) {
+  if (!iso) return ''
+  const [anio, mes, dia] = iso.split('-').map(Number)
+  return FORMATO_FECHA.format(new Date(Date.UTC(anio, mes - 1, dia)))
+}
