@@ -9,6 +9,7 @@ import {
   obtenerEvento,
   obtenerProgreso,
 } from '../api'
+import DialogoGestion from '../components/DialogoGestion'
 import ModalConfirmacion from '../components/ModalConfirmacion'
 import TarjetaProgreso from '../components/TarjetaProgreso'
 import Toast from '../components/Toast'
@@ -18,7 +19,9 @@ import {
   etiquetaSituacion,
   etiquetaTipo,
   fechaDeIso,
+  formatearFecha,
   formatearFechaHora,
+  formatearHoras,
   horaDeIso,
 } from '../formato'
 
@@ -39,6 +42,7 @@ export default function EventoDetalle() {
   const [errorGuardado, setErrorGuardado] = useState(false)
   const [modal, setModal] = useState(null)
   const [eliminando, setEliminando] = useState(false)
+  const [gestionEnEdicion, setGestionEnEdicion] = useState(null)
   const [toast, setToast] = useState(ubicacion.state?.toast ?? null)
 
   const cargar = useCallback(() => {
@@ -74,6 +78,26 @@ export default function EventoDetalle() {
   }, [id])
 
   useEffect(() => cargar(), [cargar])
+
+  const cerrarEdicionGestion = useCallback(() => setGestionEnEdicion(null), [])
+
+  async function alEditarGestion(actualizada, { conSobrecarga }) {
+    // Primero se refleja el cambio y se cierra el diálogo. Después se refrescan la lista y el avance,
+    // sin pasar por el estado de carga de toda la página: así el foco vuelve al botón Editar.
+    setSubtareas((lista) => lista.map((subtarea) => (subtarea.id === actualizada.id ? { ...subtarea, ...actualizada } : subtarea)))
+    setGestionEnEdicion(null)
+    setToast({
+      titulo: 'Gestión actualizada.',
+      mensaje: conSobrecarga ? `El ${formatearFecha(actualizada.fecha_objetivo)} queda por encima del límite diario.` : '',
+    })
+    try {
+      setSubtareas(await listarSubtareas(id))
+      setProgreso(await obtenerProgreso(id))
+      setErrorProgreso(false)
+    } catch {
+      setErrorProgreso(true)
+    }
+  }
 
   function empezarEdicion() {
     setFormulario({
@@ -397,10 +421,21 @@ export default function EventoDetalle() {
                     {etiquetaSituacion(subtarea.situacion)}
                   </span>
                 </div>
-                <p>Horas estimadas: <strong>{subtarea.horas_estimadas}</strong></p>
-                <p>Plazo: <strong>{subtarea.fecha_objetivo}</strong></p>
+                <p>Horas estimadas: <strong>{formatearHoras(subtarea.horas_estimadas)}</strong></p>
+                <p>Plazo: <strong>{formatearFecha(subtarea.fecha_objetivo)}</strong></p>
                 {subtarea.nota_posposicion && <p>{subtarea.nota_posposicion}</p>}
                 <div className="acciones-gestion">
+                  {/* Una gestión ejecutada ya no se edita: sus horas y su fecha son historia, no plan. */}
+                  {subtarea.estado !== 'EJECUTADA' && (
+                    <button
+                      type="button"
+                      className="boton boton-secundario"
+                      aria-label={`Editar ${subtarea.nombre}`}
+                      onClick={() => setGestionEnEdicion(subtarea)}
+                    >
+                      Editar
+                    </button>
+                  )}
                   {subtarea.estado !== 'EJECUTADA' && (
                     <button type="button" className="boton boton-secundario" onClick={() => marcarEjecutarSeguro(subtarea)}>
                       Marcar como ejecutada
@@ -431,6 +466,17 @@ export default function EventoDetalle() {
           }}
         />
       </section>
+
+      {gestionEnEdicion && (
+        <DialogoGestion
+          modo="editar"
+          gestion={gestionEnEdicion}
+          eventoId={id}
+          fechaEvento={fechaDeIso(evento.fecha_hora_evento)}
+          onCerrar={cerrarEdicionGestion}
+          onGuardada={alEditarGestion}
+        />
+      )}
 
       <ModalConfirmacion
         abierto={Boolean(modal)}

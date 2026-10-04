@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { listarEventos, listarSubtareas } from '../api'
+import DialogoGestion from '../components/DialogoGestion'
 import Toast from '../components/Toast'
+import { fechaDeIso, formatearFecha, formatearHoras, hoyBogota } from '../formato'
 
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 const ORDEN_GRUPOS = ['VENCIDA', 'PARA_HOY', 'PROXIMA']
@@ -28,15 +30,6 @@ function grupoDe(gestion, hoy) {
   if (gestion.fecha_objetivo < hoy) return 'VENCIDA'
   if (gestion.fecha_objetivo === hoy) return 'PARA_HOY'
   return 'PROXIMA'
-}
-
-function hoyBogota() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Bogota',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date())
 }
 
 function sumarDias(iso, dias) {
@@ -90,6 +83,7 @@ export default function Hoy() {
   const ubicacion = useLocation()
   const filtroEventoRef = useRef(null)
   const cerrarReglaRef = useRef(null)
+  const tituloRef = useRef(null)
   const [cuentaCreada, setCuentaCreada] = useState(Boolean(ubicacion.state?.cuentaCreada))
   const [eventos, setEventos] = useState([])
   const [gestiones, setGestiones] = useState([])
@@ -99,6 +93,9 @@ export default function Hoy() {
   const [error, setError] = useState(false)
   const [consulta, setConsulta] = useState(0)
   const [reglaAbierta, setReglaAbierta] = useState(false)
+  const [reprogramando, setReprogramando] = useState(null)
+  const [avisoReprogramada, setAvisoReprogramada] = useState(null)
+  const [focoPendiente, setFocoPendiente] = useState(null)
   const hoy = hoyBogota()
   const limite = sumarDias(hoy, 7)
 
@@ -145,6 +142,37 @@ export default function Hoy() {
     window.addEventListener('keydown', tecla)
     return () => window.removeEventListener('keydown', tecla)
   }, [reglaAbierta])
+
+  // Al reprogramar, la tarjeta cambia de grupo y el botón que abrió el diálogo desaparece.
+  // El foco se lleva a la tarjeta en su nuevo lugar o, si ya no está en pantalla, al título de la página.
+  useEffect(() => {
+    if (focoPendiente === null) return
+    const boton = document.getElementById(`reprogramar-${focoPendiente}`)
+    if (boton) boton.focus()
+    else tituloRef.current?.focus()
+    setFocoPendiente(null)
+  }, [focoPendiente])
+
+  const cerrarDialogo = useCallback(() => setReprogramando(null), [])
+  const cerrarAviso = useCallback(() => setAvisoReprogramada(null), [])
+
+  function alReprogramar(actualizada, { conSobrecarga }) {
+    // La lista se actualiza con lo que devolvió la API, sin recargar: la tarjeta cambia de grupo al instante.
+    setGestiones((lista) => lista.map((gestion) => (
+      gestion.id === actualizada.id ? { ...gestion, ...actualizada } : gestion
+    )))
+    setReprogramando(null)
+    setFocoPendiente(actualizada.id)
+
+    const fecha = actualizada.fecha_objetivo
+    let destino
+    if (fecha > limite) destino = 'Ya no aparece en Hoy porque está a más de 7 días. Sigue en el detalle del evento.'
+    else destino = `Ahora está en «${TITULOS[grupoDe(actualizada, hoy)]}».`
+    setAvisoReprogramada({
+      titulo: 'Gestión reprogramada.',
+      mensaje: `Nueva fecha: ${formatearFecha(fecha)}. ${destino}${conSobrecarga ? ' Ese día queda por encima del límite.' : ''}`,
+    })
+  }
 
   const filtrosActivos = filtroEvento !== '' || filtroEstado !== ''
 
@@ -193,7 +221,10 @@ export default function Hoy() {
   return (
     <section className="pagina">
       {cuentaCreada && <Toast titulo="Cuenta creada." mensaje="" onClose={() => setCuentaCreada(false)} />}
-      <h1>Hoy</h1>
+      {avisoReprogramada && (
+        <Toast titulo={avisoReprogramada.titulo} mensaje={avisoReprogramada.mensaje} onClose={cerrarAviso} duracion={6000} />
+      )}
+      <h1 ref={tituloRef} tabIndex={-1}>Hoy</h1>
       <p className="intro intro-pagina">Gestiones vencidas, para hoy y de los próximos 7 días.</p>
 
       {!cargando && !error && (
@@ -341,14 +372,26 @@ export default function Hoy() {
                           )}
                         </div>
                         {id === 'PROXIMA' ? (
-                          <p>{gestion.eventoNombre} · {gestion.horas_estimadas} h</p>
+                          <p>{gestion.eventoNombre} · {formatearHoras(gestion.horas_estimadas)}</p>
                         ) : (
                           <>
                             <p>{gestion.eventoNombre}</p>
-                            <p>Horas estimadas: <strong>{gestion.horas_estimadas}</strong></p>
+                            <p>Horas estimadas: <strong>{formatearHoras(gestion.horas_estimadas)}</strong></p>
                           </>
                         )}
-                        <Link to={`/evento/${gestion.eventoId}`}>Ver evento</Link>
+                        <div className="pie-gestion">
+                          <Link to={`/evento/${gestion.eventoId}`}>Ver evento</Link>
+                          {/* El nombre accesible incluye la gestión: en la lista hay un botón igual por tarjeta. */}
+                          <button
+                            type="button"
+                            id={`reprogramar-${gestion.id}`}
+                            className="boton boton-secundario"
+                            aria-label={`Reprogramar ${gestion.nombre}`}
+                            onClick={() => setReprogramando(gestion)}
+                          >
+                            Reprogramar
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -364,6 +407,17 @@ export default function Hoy() {
             )
           })}
         </div>
+      )}
+
+      {reprogramando && (
+        <DialogoGestion
+          modo="reprogramar"
+          gestion={reprogramando}
+          eventoId={reprogramando.eventoId}
+          fechaEvento={fechaDeIso(eventos.find((evento) => evento.id === reprogramando.eventoId)?.fecha_hora_evento)}
+          onCerrar={cerrarDialogo}
+          onGuardada={alReprogramar}
+        />
       )}
     </section>
   )
