@@ -51,3 +51,10 @@ export function etiquetaSituacion(situacion) {
   }
   return etiquetas[situacion] ?? situacion
 }
+
+const FORMATO_HORAS = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 1 })
+
+// 6 se muestra como "6 h" y 6.5 como "6,5 h". Acepta número o texto ("6.0"), que es como llega de la API.
+export function formatearHoras(valor) {
+  return `${FORMATO_HORAS.format(Number(valor))} h`
+}
