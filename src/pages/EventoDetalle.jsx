@@ -23,6 +23,7 @@ import {
   formatearFechaHora,
   formatearHoras,
   horaDeIso,
+  textoConflictoResuelto,
 } from '../formato'
 
 export default function EventoDetalle() {
@@ -81,14 +82,16 @@ export default function EventoDetalle() {
 
   const cerrarEdicionGestion = useCallback(() => setGestionEnEdicion(null), [])
 
-  async function alEditarGestion(actualizada, { conSobrecarga }) {
+  async function alEditarGestion(actualizada, { conSobrecarga, desdeConflicto, cargaDelDia }) {
     // Primero se refleja el cambio y se cierra el diálogo. Después se refrescan la lista y el avance,
     // sin pasar por el estado de carga de toda la página: así el foco vuelve al botón Editar.
     setSubtareas((lista) => lista.map((subtarea) => (subtarea.id === actualizada.id ? { ...subtarea, ...actualizada } : subtarea)))
     setGestionEnEdicion(null)
+    const resuelto = desdeConflicto && textoConflictoResuelto(cargaDelDia)
     setToast({
-      titulo: 'Gestión actualizada.',
-      mensaje: conSobrecarga ? `El ${formatearFecha(actualizada.fecha_objetivo)} queda por encima del límite diario.` : '',
+      titulo: resuelto ? 'Conflicto resuelto.' : 'Gestión actualizada.',
+      mensaje: resuelto
+        || (conSobrecarga ? `El ${formatearFecha(actualizada.fecha_objetivo)} queda por encima del límite diario.` : ''),
     })
     try {
       setSubtareas(await listarSubtareas(id))

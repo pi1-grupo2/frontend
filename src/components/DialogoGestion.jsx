@@ -26,6 +26,7 @@ const TEXTOS = {
   tituloConflicto: 'Ese día quedaría con sobrecarga',
   preguntaConflicto: '¿Cómo resolverlo?',
   otraFecha: 'Elegir otra fecha',
+  sinFecha: 'No hay otro día con cupo antes del evento.',
   reducir: 'Reducir horas',
   horasReducidas: 'Horas estimadas de esta gestión',
   guardarReducidas: 'Guardar con menos horas',
@@ -144,13 +145,14 @@ export default function DialogoGestion({ modo, gestion, eventoId, fechaEvento, o
     setTimeout(() => destino.current?.focus(), 0)
   }
 
-  async function enviar(datos, confirmarSobrecarga = false) {
+  async function enviar(datos, { confirmarSobrecarga = false, desdeConflicto = false } = {}) {
     setGuardando(true)
     setErrorGeneral(false)
     try {
       const cuerpo = confirmarSobrecarga ? { ...datos, confirmar_sobrecarga: true } : datos
       const actualizada = await actualizarSubtarea(eventoId, gestion.id, cuerpo)
-      onGuardada(actualizada, { conSobrecarga: confirmarSobrecarga })
+      const { carga_del_dia: cargaDelDia, ...gestionGuardada } = actualizada
+      onGuardada(gestionGuardada, { conSobrecarga: confirmarSobrecarga, desdeConflicto, cargaDelDia })
     } catch (error) {
       const respuesta = error.datos ?? {}
       if (error.status === 409 && respuesta.codigo === 'sobrecarga_diaria') {
@@ -194,6 +196,13 @@ export default function DialogoGestion({ modo, gestion, eventoId, fechaEvento, o
     enviar(datos)
   }
 
+  function moverAFechaSugerida() {
+    enviar(
+      { ...conflicto.datos, fecha_objetivo: conflicto.fecha_sugerida },
+      { desdeConflicto: true },
+    )
+  }
+
   function guardarConMenosHoras(evento) {
     evento.preventDefault()
     const horasEnviadas = Number(conflicto.datos.horas_estimadas ?? horasActuales)
@@ -205,7 +214,10 @@ export default function DialogoGestion({ modo, gestion, eventoId, fechaEvento, o
     }
     setErrorReducir('')
     setHoras(String(nuevas))
-    enviar({ ...conflicto.datos, horas_estimadas: nuevas })
+    enviar(
+      { ...conflicto.datos, horas_estimadas: nuevas },
+      { desdeConflicto: true },
+    )
   }
 
   // Cuántas horas puede tener esta gestión para que el día quede dentro del límite.
@@ -352,22 +364,45 @@ export default function DialogoGestion({ modo, gestion, eventoId, fechaEvento, o
             {!reduciendo && (
               <>
                 <p className="pregunta-conflicto">{TEXTOS.preguntaConflicto}</p>
-                <div className="modal-acciones">
-                  <button type="button" className="boton boton-primario" onClick={() => volverAlFormulario()} disabled={guardando}>
-                    {TEXTOS.otraFecha}
-                  </button>
-                  <button
-                    type="button"
-                    className="boton boton-secundario"
-                    onClick={() => {
-                      setHorasReducidas('')
-                      setReduciendo(true)
-                    }}
-                    disabled={guardando}
-                  >
-                    {TEXTOS.reducir}
-                  </button>
-                </div>
+                {conflicto.fecha_sugerida ? (
+                  <div className="modal-acciones">
+                    <button type="button" className="boton boton-primario" onClick={moverAFechaSugerida} disabled={guardando}>
+                      {guardando && <span className="spinner" aria-hidden="true" />}
+                      {`Mover al ${formatearFecha(conflicto.fecha_sugerida)}`}
+                    </button>
+                    <button
+                      type="button"
+                      className="boton boton-secundario"
+                      onClick={() => {
+                        setHorasReducidas('')
+                        setReduciendo(true)
+                      }}
+                      disabled={guardando}
+                    >
+                      {TEXTOS.reducir}
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <p>{TEXTOS.sinFecha}</p>
+                    <div className="modal-acciones">
+                      <button
+                        type="button"
+                        className="boton boton-primario"
+                        onClick={() => {
+                          setHorasReducidas('')
+                          setReduciendo(true)
+                        }}
+                        disabled={guardando}
+                      >
+                        {TEXTOS.reducir}
+                      </button>
+                      <button type="button" className="boton boton-secundario" onClick={() => volverAlFormulario()} disabled={guardando}>
+                        {TEXTOS.otraFecha}
+                      </button>
+                    </div>
+                  </>
+                )}
               </>
             )}
 
@@ -424,7 +459,7 @@ export default function DialogoGestion({ modo, gestion, eventoId, fechaEvento, o
 
             {/* El conflicto advierte pero no bloquea: siempre hay salida para guardar tal cual o desistir. */}
             <div className="salidas-conflicto">
-              <button type="button" className="enlace-boton" onClick={() => enviar(conflicto.datos, true)} disabled={guardando}>
+              <button type="button" className="enlace-boton" onClick={() => enviar(conflicto.datos, { confirmarSobrecarga: true })} disabled={guardando}>
                 {TEXTOS.conSobrecarga}
               </button>
               <button type="button" className="enlace-boton" onClick={onCerrar} disabled={guardando}>
