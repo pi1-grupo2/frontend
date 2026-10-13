@@ -10,6 +10,7 @@ import {
   obtenerProgreso,
 } from '../api'
 import DialogoGestion from '../components/DialogoGestion'
+import DialogoPosponer from '../components/DialogoPosponer'
 import ModalConfirmacion from '../components/ModalConfirmacion'
 import TarjetaProgreso from '../components/TarjetaProgreso'
 import Toast from '../components/Toast'
@@ -44,6 +45,7 @@ export default function EventoDetalle() {
   const [modal, setModal] = useState(null)
   const [eliminando, setEliminando] = useState(false)
   const [gestionEnEdicion, setGestionEnEdicion] = useState(null)
+  const [posponiendo, setPosponiendo] = useState(null)
   const [toast, setToast] = useState(ubicacion.state?.toast ?? null)
 
   const cargar = useCallback(() => {
@@ -198,11 +200,36 @@ export default function EventoDetalle() {
   }
 
   async function marcarEjecutada(subtarea) {
-    await actualizarSubtarea(id, subtarea.id, { estado: 'EJECUTADA' })
-    const lista = await listarSubtareas(id)
-    setSubtareas(lista)
-    const avance = await obtenerProgreso(id)
-    setProgreso(avance)
+    try {
+      await actualizarSubtarea(id, subtarea.id, { estado: 'EJECUTADA' })
+      setSubtareas(await listarSubtareas(id))
+      setProgreso(await obtenerProgreso(id))
+      setErrorProgreso(false)
+      setToast({
+        titulo: 'Gestión ejecutada.',
+        mensaje: `${subtarea.nombre} quedó registrada como hecha.`,
+      })
+    } catch {
+      setToast({
+        titulo: 'No se pudo registrar el avance.',
+        mensaje: 'La gestión sigue como estaba. Intenta de nuevo en unos minutos.',
+      })
+    }
+  }
+
+  async function confirmarPosposicion(nota) {
+    const datos = { estado: 'POSPUESTA' }
+    if (nota) datos.nota_posposicion = nota
+    await actualizarSubtarea(id, posponiendo.id, datos)
+    const nombre = posponiendo.nombre
+    setPosponiendo(null)
+    setSubtareas(await listarSubtareas(id))
+    setProgreso(await obtenerProgreso(id))
+    setErrorProgreso(false)
+    setToast({
+      titulo: 'Gestión pospuesta.',
+      mensaje: nota ? `${nombre} quedó pospuesta: ${nota}` : `${nombre} quedó pospuesta.`,
+    })
   }
 
   if (cargando) {
@@ -426,7 +453,9 @@ export default function EventoDetalle() {
                 </div>
                 <p>Horas estimadas: <strong>{formatearHoras(subtarea.horas_estimadas)}</strong></p>
                 <p>Plazo: <strong>{formatearFecha(subtarea.fecha_objetivo)}</strong></p>
-                {subtarea.nota_posposicion && <p>{subtarea.nota_posposicion}</p>}
+                {subtarea.nota_posposicion && (
+                  <p>Nota: {subtarea.nota_posposicion}</p>
+                )}
                 <div className="acciones-gestion">
                   {/* Una gestión ejecutada ya no se edita: sus horas y su fecha son historia, no plan. */}
                   {subtarea.estado !== 'EJECUTADA' && (
@@ -440,8 +469,23 @@ export default function EventoDetalle() {
                     </button>
                   )}
                   {subtarea.estado !== 'EJECUTADA' && (
-                    <button type="button" className="boton boton-secundario" onClick={() => marcarEjecutarSeguro(subtarea)}>
+                    <button
+                      type="button"
+                      className="boton boton-secundario"
+                      aria-label={`Marcar ${subtarea.nombre} como ejecutada`}
+                      onClick={() => marcarEjecutada(subtarea)}
+                    >
                       Marcar como ejecutada
+                    </button>
+                  )}
+                  {subtarea.estado !== 'EJECUTADA' && (
+                    <button
+                      type="button"
+                      className="boton boton-secundario"
+                      aria-label={`Posponer ${subtarea.nombre}`}
+                      onClick={() => setPosponiendo(subtarea)}
+                    >
+                      Posponer
                     </button>
                   )}
                   <button
@@ -481,6 +525,14 @@ export default function EventoDetalle() {
         />
       )}
 
+      {posponiendo && (
+        <DialogoPosponer
+          nombre={posponiendo.nombre}
+          onCerrar={() => setPosponiendo(null)}
+          onConfirmar={confirmarPosposicion}
+        />
+      )}
+
       <ModalConfirmacion
         abierto={Boolean(modal)}
         titulo={modal?.tipo === 'gestion' ? '¿Eliminar esta gestión?' : '¿Eliminar este evento?'}
@@ -496,12 +548,4 @@ export default function EventoDetalle() {
       />
     </section>
   )
-
-  async function marcarEjecutarSeguro(subtarea) {
-    try {
-      await marcarEjecutada(subtarea)
-    } catch {
-      setErrorGuardado(true)
-    }
-  }
 }
