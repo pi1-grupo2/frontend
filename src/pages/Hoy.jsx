@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { listarEventos, listarSubtareas } from '../api'
+import { actualizarSubtarea, listarEventos, listarSubtareas } from '../api'
 import DialogoGestion from '../components/DialogoGestion'
+import DialogoPosponer from '../components/DialogoPosponer'
 import Toast from '../components/Toast'
 import { fechaDeIso, formatearFecha, formatearHoras, hoyBogota, textoConflictoResuelto } from '../formato'
 
@@ -94,6 +95,7 @@ export default function Hoy() {
   const [consulta, setConsulta] = useState(0)
   const [reglaAbierta, setReglaAbierta] = useState(false)
   const [reprogramando, setReprogramando] = useState(null)
+  const [posponiendo, setPosponiendo] = useState(null)
   const [avisoReprogramada, setAvisoReprogramada] = useState(null)
   const [focoPendiente, setFocoPendiente] = useState(null)
   const hoy = hoyBogota()
@@ -193,6 +195,7 @@ export default function Hoy() {
   const visibles = useMemo(() => {
     return enVentana.filter((gestion) => {
       if (filtroEvento && String(gestion.eventoId) !== filtroEvento) return false
+      if (filtroEstado === 'POSPUESTA') return gestion.estado === 'POSPUESTA'
       if (filtroEstado && grupoDe(gestion, hoy) !== filtroEstado) return false
       return true
     })
@@ -214,9 +217,47 @@ export default function Hoy() {
   const totalVisible = ORDEN_GRUPOS.reduce((suma, id) => suma + grupos.listas[id].length, 0)
   const hayDatos = enVentana.length > 0
   const mostrarGrupos = hayDatos && (!filtrosActivos || totalVisible > 0)
-  // Con filtro por estado solo se muestra el grupo elegido. Los otros dos quedarían vacíos
-  // repitiendo lo que el usuario acaba de pedir.
-  const gruposEnPantalla = filtroEstado ? [filtroEstado] : ORDEN_GRUPOS
+  // Pospuestas no es un grupo de fecha: se siguen viendo en vencidas, hoy y próximas.
+  const gruposEnPantalla = filtroEstado && filtroEstado !== 'POSPUESTA' ? [filtroEstado] : ORDEN_GRUPOS
+
+  function aplicarAvance(actualizada, gestion) {
+    setGestiones((lista) => lista.map((item) => (
+      item.id === actualizada.id
+        ? { ...item, ...actualizada, eventoNombre: gestion.eventoNombre, eventoId: gestion.eventoId }
+        : item
+    )))
+  }
+
+  async function marcarEjecutada(gestion) {
+    try {
+      const actualizada = await actualizarSubtarea(gestion.eventoId, gestion.id, { estado: 'EJECUTADA' })
+      aplicarAvance(actualizada, gestion)
+      setAvisoReprogramada({
+        titulo: 'Gestión ejecutada.',
+        mensaje: `${gestion.nombre} quedó registrada como hecha y salió de la agenda.`,
+      })
+    } catch {
+      setAvisoReprogramada({
+        titulo: 'No se pudo registrar el avance.',
+        mensaje: 'La gestión sigue en la agenda. Intenta de nuevo en unos minutos.',
+      })
+    }
+  }
+
+  async function confirmarPosposicion(nota) {
+    const gestion = posponiendo
+    const datos = { estado: 'POSPUESTA' }
+    if (nota) datos.nota_posposicion = nota
+    const actualizada = await actualizarSubtarea(gestion.eventoId, gestion.id, datos)
+    aplicarAvance(actualizada, gestion)
+    setPosponiendo(null)
+    setAvisoReprogramada({
+      titulo: 'Gestión pospuesta.',
+      mensaje: nota
+        ? `${gestion.nombre} quedó pospuesta: ${nota}`
+        : `${gestion.nombre} quedó pospuesta y sigue en su fecha.`,
+    })
+  }
 
   function limpiarFiltros() {
     setFiltroEvento('')
@@ -317,12 +358,11 @@ export default function Hoy() {
               value={filtroEstado}
               onChange={(evento) => setFiltroEstado(evento.target.value)}
             >
-              {/* Solo estados que el usuario puede producir hoy. "Pospuestas" regresa
-                  cuando exista la acción de posponer (US-09, Sprint 4). */}
               <option value="">Todos</option>
               <option value="VENCIDA">Vencidas</option>
               <option value="PARA_HOY">Para hoy</option>
               <option value="PROXIMA">Próximas</option>
+              <option value="POSPUESTA">Pospuestas</option>
             </select>
           </div>
         </form>
@@ -377,6 +417,7 @@ export default function Hoy() {
                             <span className="insignia insignia-pospuesta">Pospuesta</span>
                           )}
                         </div>
+                        {gestion.nota_posposicion && <p>Nota: {gestion.nota_posposicion}</p>}
                         {id === 'PROXIMA' ? (
                           <p>{gestion.eventoNombre} · {formatearHoras(gestion.horas_estimadas)}</p>
                         ) : (
@@ -387,6 +428,22 @@ export default function Hoy() {
                         )}
                         <div className="pie-gestion">
                           <Link to={`/evento/${gestion.eventoId}`}>Ver evento</Link>
+                          <button
+                            type="button"
+                            className="boton boton-secundario"
+                            aria-label={`Marcar ${gestion.nombre} como ejecutada`}
+                            onClick={() => marcarEjecutada(gestion)}
+                          >
+                            Marcar como ejecutada
+                          </button>
+                          <button
+                            type="button"
+                            className="boton boton-secundario"
+                            aria-label={`Posponer ${gestion.nombre}`}
+                            onClick={() => setPosponiendo(gestion)}
+                          >
+                            Posponer
+                          </button>
                           {/* El nombre accesible incluye la gestión: en la lista hay un botón igual por tarjeta. */}
                           <button
                             type="button"
@@ -413,6 +470,14 @@ export default function Hoy() {
             )
           })}
         </div>
+      )}
+
+      {posponiendo && (
+        <DialogoPosponer
+          nombre={posponiendo.nombre}
+          onCerrar={() => setPosponiendo(null)}
+          onConfirmar={confirmarPosposicion}
+        />
       )}
 
       {reprogramando && (
