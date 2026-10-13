@@ -93,7 +93,7 @@ export function obtenerOrganizador() {
 }
 
 export function actualizarOrganizador(datos) {
-  return solicitar('/organizador/', { method: 'PATCH', body: JSON.stringify(datos) })
+  return solicitar('/organizador/', { method: 'PUT', body: JSON.stringify(datos) })
 }
 
 export function listarEventos() {

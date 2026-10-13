@@ -30,11 +30,17 @@ const TEXTOS = {
   exitoTitulo: 'Límite actualizado.',
 }
 
+// "6,5" y "6.5" son el mismo límite. La ayuda del campo usa la coma.
+function normalizarLimite(texto) {
+  return String(texto).trim().replace(',', '.')
+}
+
 // Devuelve el mensaje de error del valor escrito, o una cadena vacía si es válido.
 // Repite las reglas del backend para avisar sin esperar la respuesta del servidor.
 function validarLimite(texto) {
-  if (String(texto).trim() === '') return TEXTOS.errorVacio
-  const valor = Number(texto)
+  const limpio = normalizarLimite(texto)
+  if (limpio === '') return TEXTOS.errorVacio
+  const valor = Number(limpio)
   if (Number.isNaN(valor)) return TEXTOS.errorVacio
   if (valor < LIMITE_MINIMO || valor > LIMITE_MAXIMO) return TEXTOS.errorRango
   if ((valor / PASO) % 1 !== 0) return TEXTOS.errorPaso
@@ -88,7 +94,9 @@ export default function Configuracion() {
 
     setGuardando(true)
     try {
-      const organizador = await actualizarOrganizador({ limite_diario_horas: Number(valor) })
+      const organizador = await actualizarOrganizador({
+        limite_diario_horas: Number(normalizarLimite(valor)),
+      })
       const limite = Number(organizador.limite_diario_horas)
       setLimiteActual(limite)
       setValor(String(limite))

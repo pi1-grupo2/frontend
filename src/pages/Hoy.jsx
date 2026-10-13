@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { listarEventos, listarSubtareas } from '../api'
 import DialogoGestion from '../components/DialogoGestion'
 import Toast from '../components/Toast'
-import { fechaDeIso, formatearFecha, formatearHoras, hoyBogota } from '../formato'
+import { fechaDeIso, formatearFecha, formatearHoras, hoyBogota, textoConflictoResuelto } from '../formato'
 
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 const ORDEN_GRUPOS = ['VENCIDA', 'PARA_HOY', 'PROXIMA']
@@ -156,13 +156,19 @@ export default function Hoy() {
   const cerrarDialogo = useCallback(() => setReprogramando(null), [])
   const cerrarAviso = useCallback(() => setAvisoReprogramada(null), [])
 
-  function alReprogramar(actualizada, { conSobrecarga }) {
+  function alReprogramar(actualizada, { conSobrecarga, desdeConflicto, cargaDelDia }) {
     // La lista se actualiza con lo que devolvió la API, sin recargar: la tarjeta cambia de grupo al instante.
     setGestiones((lista) => lista.map((gestion) => (
       gestion.id === actualizada.id ? { ...gestion, ...actualizada } : gestion
     )))
     setReprogramando(null)
     setFocoPendiente(actualizada.id)
+
+    const resuelto = desdeConflicto && textoConflictoResuelto(cargaDelDia)
+    if (resuelto) {
+      setAvisoReprogramada({ titulo: 'Conflicto resuelto.', mensaje: resuelto })
+      return
+    }
 
     const fecha = actualizada.fecha_objetivo
     let destino

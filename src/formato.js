@@ -76,6 +76,14 @@ const FORMATO_FECHA = new Intl.DateTimeFormat('es-CO', {
   timeZone: 'UTC',
 })
 
+// Aviso de C4 cuando mover o reducir dejó el día dentro del límite.
+export function textoConflictoResuelto(carga) {
+  if (!carga?.dentro_del_limite) return ''
+  const horas = formatearHoras(carga.horas_planificadas)
+  const limite = formatearHoras(carga.limite_diario_horas)
+  return `El ${formatearFecha(carga.fecha)} queda con ${horas} de ${limite}.`
+}
+
 // "2026-10-09" se muestra como "9 de octubre de 2026". Se arma en UTC para que la fecha no se corra un día.
 export function formatearFecha(iso) {
   if (!iso) return ''
