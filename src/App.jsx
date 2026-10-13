@@ -9,6 +9,7 @@ import EventoDetalle from './pages/EventoDetalle.jsx'
 import Login from './pages/Login.jsx'
 import Registro from './pages/Registro.jsx'
 import Configuracion from './pages/Configuracion.jsx'
+import Progreso from './pages/Progreso.jsx'
 import { cerrarSesion, tomarAviso } from './sesion'
 
 function RutaProtegida() {
@@ -72,6 +73,7 @@ function Shell() {
           <NavLink to="/hoy">Hoy</NavLink>
           <NavLink to="/crear">+ Crear evento</NavLink>
           <EnlaceMisEventos />
+          <NavLink to="/progreso">Progreso</NavLink>
           <NavLink to="/configuracion">Configuración</NavLink>
         </nav>
         <p className="sesion-usuario">{sesion?.organizador?.nombre}</p>
@@ -101,7 +103,7 @@ export default function App() {
             <Route path="/eventos" element={<Eventos />} />
             <Route path="/evento/:id" element={<EventoDetalle />} />
             <Route path="/configuracion" element={<Configuracion />} />
-            <Route path="/progreso" element={<Navigate to="/eventos" replace />} />
+            <Route path="/progreso" element={<Progreso />} />
           </Route>
         </Route>
         <Route path="*" element={<p className="pagina-ausente">Esta página no existe.</p>} />
