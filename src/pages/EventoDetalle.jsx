@@ -123,14 +123,28 @@ export default function EventoDetalle() {
     if (!formulario.nombre.trim()) fallo.nombre = 'Este campo es obligatorio para planificar el evento.'
     if (!formulario.tipo) fallo.tipo = 'Este campo es obligatorio para planificar el evento.'
     if (!formulario.fecha) {
-      fallo.fecha = 'Este campo es obligatorio para planificar el evento.'
+      fallo.fecha = 'Este campo es obligatorio para planificar el evento.' 
     } else {
       const hoy = new Date()
       hoy.setHours(0, 0, 0, 0)
-      if (new Date(`${formulario.fecha}T00:00:00`) <= hoy) {
-        fallo.fecha = 'La fecha del evento debe ser posterior al día de hoy.'
+
+    if (new Date(`${formulario.fecha}T00:00:00`) <= hoy) {
+      fallo.fecha = 'La fecha del evento debe ser posterior al día de hoy.'
+    } else {
+      const gestionesFueraDePlazo = subtareas.filter(
+        (subtarea) => subtarea.fecha_objetivo > formulario.fecha
+      )
+
+      if (gestionesFueraDePlazo.length > 0) {
+        const nombres = gestionesFueraDePlazo
+          .map((subtarea) => subtarea.nombre)
+          .join(', ')
+
+        fallo.fecha =
+          `La nueva fecha del evento no puede ser anterior al plazo de estas gestiones: ${nombres}. Reprograma primero las gestiones afectadas.`
       }
     }
+  }
     if (!formulario.hora) fallo.hora = 'Este campo es obligatorio para planificar el evento.'
     if (!formulario.lugar.trim()) fallo.lugar = 'Este campo es obligatorio para planificar el evento.'
     return fallo

@@ -1,0 +1,50 @@
+[33m1e1fc5c[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #22 from pi1-grupo2/feature/registrar-avance-jb
+[33m3088417[m[33m ([m[1;31morigin/feature/registrar-avance-jb[m[33m)[m feat(hoy): registrar el avance y actualizar la agenda
+[33m82b2b3b[m feat(evento): posponer una gestion con nota opcional
+[33mb76fe3c[m Merge pull request #21 from pi1-grupo2/feature/resolver-conflicto-en-pantalla-jb
+[33mca465d3[m[33m ([m[1;31morigin/feature/resolver-conflicto-en-pantalla-jb[m[33m)[m feat(sobrecarga): resolver el conflicto con la fecha sugerida
+[33m921737f[m Merge pull request #20 from pi1-grupo2/feature/reprogramar-gestion-AFH
+[33m6fb88d8[m Merge pull request #19 from pi1-grupo2/feature/configuracion-limite-AFH
+[33md52e7fc[m[33m ([m[1;31morigin/feature/reprogramar-gestion-AFH[m[33m)[m feat(evento): editar gestiones desde el detalle
+[33m75e18ae[m feat(hoy): reprogramar gestiones desde la agenda
+[33mec55e69[m feat(gestiones): agregar dialogo de edicion con aviso de sobrecarga
+[33me80051a[m feat(toast): permitir duracion configurable
+[33mb11bace[m feat(formato): agregar fecha larga y fecha de hoy compartida
+[33m150d8cb[m[33m ([m[1;31morigin/feature/configuracion-limite-AFH[m[33m)[m refactor(crear): quitar el limite diario del formulario de evento
+[33m63fca45[m feat(configuracion): cargar, validar y guardar el limite diario
+[33m072135b[m feat(formato): agregar formato unico de horas
+[33m7921840[m feat(configuracion): agregar ruta y entrada de menu
+[33m33d0d67[m Merge pull request #18 from pi1-grupo2/feature/correcciones-sprint2-AFH
+[33ma4d5e00[m[33m ([m[1;31morigin/feature/correcciones-sprint2-AFH[m[33m)[m fix(navegacion): llevar a Hoy al iniciar sesion
+[33m9117064[m fix(navegacion): fijar la barra lateral en escritorio
+[33m25752bf[m feat(navegacion): indicar la ubicacion en el detalle de evento
+[33mc38150f[m style(gestiones): ubicar las acciones a la derecha de la tarjeta
+[33m89c3cac[m style(formularios): alinear acciones a la izquierda con la accion principal primero
+[33m780df27[m fix(crear): no repetir el aviso de plan vacio
+[33ma54dea9[m fix(hoy): filtrar por estado con opciones que el usuario puede producir
+[33m8b14383[m fix(login): quitar aviso de ruta protegida y confirmar cierre de sesion con toast
+[33m56c8b91[m Merge pull request #17 from pi1-grupo2/feature/ux-hoy-desde-main
+[33m42120f0[m[33m ([m[1;31morigin/feature/ux-hoy-desde-main[m[33m)[m feat: aplicar la jerarquia y los filtros de Hoy
+[33m4dc84d0[m Merge pull request #15 from pi1-grupo2/feature/ux-acceso
+[33m602db11[m[33m ([m[1;31morigin/feature/ux-acceso[m[33m)[m feat: agregar la pantalla de crear cuenta
+[33mcf802eb[m feat: alinear el inicio de sesion con los textos de UX
+[33m89426a6[m Merge pull request #14 from pi1-grupo2/feature/quitar-textos-hoy
+[33m677e734[m[33m ([m[1;31morigin/feature/quitar-textos-hoy[m[33m)[m style: quitar la explicacion de prioridad en Hoy
+[33m3485df6[m Merge pull request #13 from pi1-grupo2/feature/prioridad-hoy-y-sesion
+[33m5ee9eae[m[33m ([m[1;31morigin/feature/prioridad-hoy-y-sesion[m[33m)[m feat: priorizar Hoy y cerrar la sesion cuando vence
+[33m654a6fd[m Merge pull request #10 from pi1-grupo2/feature/us-11-login-local
+[33m4fd0eb1[m Merge pull request #8 from pi1-grupo2/feature/us-05-filtros-hoy
+[33ma04e36f[m Merge pull request #7 from pi1-grupo2/feature/correcciones-layout-front
+[33m5bab5f8[m[33m ([m[1;31morigin/feature/us-11-login-local[m[33m)[m feat: exigir inicio de sesion para ver los datos del organizador
+[33me154ed6[m[33m ([m[1;31morigin/feature/us-05-filtros-hoy[m[33m)[m feat: filtrar las gestiones de Hoy por evento y estado
+[33mf47e0c6[m[33m ([m[1;31morigin/feature/correcciones-layout-front[m[33m)[m style: centrar el panel y meter los titulos dentro de los formularios
+[33mcee9354[m Merge pull request #6 from pi1-grupo2/feature/ajuste-estilo-produccion
+[33m0dcac83[m[33m ([m[1;31morigin/feature/ajuste-estilo-produccion[m[33m)[m style: ajustar el radio de las tarjetas y los botones
+[33mcfdb0c0[m[33m ([m[1;31morigin/feature/sprint1-flujo-completo[m[33m)[m fix(crear): eliminar cierres de etiqueta sobrantes tras el merge
+[33mc1e76cb[m Merge branch 'main' into feature/sprint1-flujo-completo
+[33mdb3b1e1[m Merge pull request #3 from pi1-grupo2/feature/estilos-formulario-crear
+[33m7dd6360[m feat: aplicar la interfaz de EventFlow a la navegacion
+[33mc0cd874[m feat: persistir el alta del evento y mostrar su plan logistico
+[33m9f959a6[m feat: agregar modal, aviso y tarjeta de progreso
+[33mf0f0d92[m feat: conectar el cliente con los endpoints del sprint 1
+[33m694ea33[m[33m ([m[1;31morigin/feature/estilos-formulario-crear[m[33m)[m feat: aplicar la guia visual al formulario de crear evento
