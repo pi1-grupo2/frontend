@@ -231,20 +231,24 @@ export default function EventoDetalle() {
     }
   }
 
-  async function confirmarPosposicion(nota) {
-    const datos = { estado: 'POSPUESTA' }
-    if (nota) datos.nota_posposicion = nota
-    await actualizarSubtarea(id, posponiendo.id, datos)
-    const nombre = posponiendo.nombre
+  async function confirmarPosposicion({ datos, nota, fechaObjetivo }) {
+    const gestion = posponiendo
+
+    await actualizarSubtarea(id, gestion.id, datos)
+
+    const fechaFinal = datos.fecha_objetivo ?? fechaObjetivo ?? gestion.fecha_objetivo
     setPosponiendo(null)
+
     setSubtareas(await listarSubtareas(id))
     setProgreso(await obtenerProgreso(id))
     setErrorProgreso(false)
+
     setToast({
       titulo: 'Gestión pospuesta.',
-      mensaje: nota ? `${nombre} quedó pospuesta: ${nota}` : `${nombre} quedó pospuesta.`,
+      mensaje: `${gestion.nombre} quedó pospuesta para el ${formatearFecha(fechaFinal)}.${nota ? ` Nota: ${nota}` : ''}`,
     })
   }
+
 
   if (cargando) {
     return (
@@ -542,6 +546,10 @@ export default function EventoDetalle() {
       {posponiendo && (
         <DialogoPosponer
           nombre={posponiendo.nombre}
+          eventoId={id}
+          subtareaId={posponiendo.id}
+          fechaActual={posponiendo.fecha_objetivo}
+          fechaEvento={fechaDeIso(evento?.fecha_hora_evento)}
           onCerrar={() => setPosponiendo(null)}
           onConfirmar={confirmarPosposicion}
         />

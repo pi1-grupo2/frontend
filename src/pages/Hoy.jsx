@@ -244,26 +244,30 @@ export default function Hoy() {
     }
   }
 
-  async function confirmarPosposicion(nota) {
+  async function confirmarPosposicion({ datos, nota, fechaObjetivo }) {
     const gestion = posponiendo
-    const datos = { estado: 'POSPUESTA' }
-    if (nota) datos.nota_posposicion = nota
-    const actualizada = await actualizarSubtarea(gestion.eventoId, gestion.id, datos)
+    const actualizada = await actualizarSubtarea(
+      gestion.eventoId,
+      gestion.id,
+      datos,
+    )
+
     aplicarAvance(actualizada, gestion)
     setPosponiendo(null)
+
+    const fechaFinal = actualizada.fecha_objetivo ?? fechaObjetivo ?? gestion.fecha_objetivo
+
     setAvisoReprogramada({
       titulo: 'Gestión pospuesta.',
-      mensaje: nota
-        ? `${gestion.nombre} quedó pospuesta: ${nota}`
-        : `${gestion.nombre} quedó pospuesta y sigue en su fecha.`,
+      mensaje: `${gestion.nombre} quedó pospuesta para el ${formatearFecha(fechaFinal)}.${nota ? ` Nota: ${nota}` : ''}`,
     })
   }
 
-  function limpiarFiltros() {
-    setFiltroEvento('')
-    setFiltroEstado('')
-    filtroEventoRef.current?.focus()
-  }
+    function limpiarFiltros() {
+      setFiltroEvento('')
+      setFiltroEstado('')
+      filtroEventoRef.current?.focus()
+    }
 
   return (
     <section className="pagina">
@@ -475,6 +479,11 @@ export default function Hoy() {
       {posponiendo && (
         <DialogoPosponer
           nombre={posponiendo.nombre}
+          eventoId={posponiendo.eventoId}
+          subtareaId={posponiendo.id}
+          fechaEvento={fechaDeIso(
+            eventos.find((evento) => evento.id === posponiendo.eventoId)?.fecha_hora_evento
+          )}
           onCerrar={() => setPosponiendo(null)}
           onConfirmar={confirmarPosposicion}
         />
