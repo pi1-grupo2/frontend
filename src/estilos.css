@@ -569,3 +569,7 @@ h3 { margin: 0; font-size: 1.05rem; }
   .tarjeta-evento, .encabezado-detalle, .acciones-edicion { align-items: stretch; flex-direction: column; }
   .tarjeta-evento .boton { width: 100%; }
 }
+
+.lista-progreso { list-style: none; margin: 0; padding: 0; }
+.lista-progreso li { margin-bottom: 1.25rem; }
+.enlace-progreso { margin: -0.4rem 0 0; }

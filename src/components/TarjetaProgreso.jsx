@@ -16,12 +16,12 @@ export default function TarjetaProgreso({ progreso, cargando, error, onReintenta
       <section className="tarjeta-progreso tarjeta-progreso-error" role="alert">
         <div className="circulo-progreso circulo-error" aria-hidden="true">✕</div>
         <div>
-          <h2>Progreso de Preparación del Evento</h2>
-          <p>No se han podido cargar las gestiones del evento.</p>
+          <h2>No se pudo cargar el progreso</h2>
+          <p>No llegaron las gestiones de este evento. Intenta de nuevo.</p>
           <div className="barra-progreso barra-error" />
           {onReintentar && (
             <button type="button" className="boton boton-secundario" onClick={onReintentar}>
-              Intentar de nuevo
+              Reintentar
             </button>
           )}
         </div>
@@ -36,11 +36,11 @@ export default function TarjetaProgreso({ progreso, cargando, error, onReintenta
   if (total === 0) {
     return (
       <section className="tarjeta-progreso tarjeta-progreso-vacio" role="status">
-        <div className="circulo-progreso circulo-exito" aria-hidden="true">✓</div>
+        <div className="circulo-progreso" aria-label="0 por ciento">0%</div>
         <div>
-          <h2>Progreso de Preparación del Evento</h2>
-          <p>Aún no tienes gestiones planificadas para este evento.</p>
-          <div className="barra-progreso barra-exito" />
+          <h2>Progreso de preparación</h2>
+          <p>Este evento aún no tiene gestiones. Agrégalas en el detalle para empezar a medir el avance.</p>
+          <div className="barra-progreso" aria-hidden="true" />
         </div>
       </section>
     )
@@ -55,9 +55,9 @@ export default function TarjetaProgreso({ progreso, cargando, error, onReintenta
         {porcentaje}%
       </div>
       <div>
-        <h2>Progreso de Preparación del Evento</h2>
+        <h2>Progreso de preparación</h2>
         <p>
-          {hechas} de {total} gestiones logísticas ejecutadas
+          {hechas} de {total} gestiones ejecutadas
           {progreso?.nombre ? ` en ${progreso.nombre}` : ''}
         </p>
         <div className="barra-progreso" aria-hidden="true">
