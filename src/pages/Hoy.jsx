@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { actualizarSubtarea, listarEventos, listarSubtareas } from '../api'
+import {
+  actualizarSubtarea,
+  listarEventos,
+  listarSubtareas,
+  obtenerOrganizador,
+} from '../api'
 import DialogoGestion from '../components/DialogoGestion'
 import DialogoPosponer from '../components/DialogoPosponer'
 import Toast from '../components/Toast'
@@ -98,8 +103,31 @@ export default function Hoy() {
   const [posponiendo, setPosponiendo] = useState(null)
   const [avisoReprogramada, setAvisoReprogramada] = useState(null)
   const [focoPendiente, setFocoPendiente] = useState(null)
+  const [limiteDiario, setLimiteDiario] = useState(null)
   const hoy = hoyBogota()
   const limite = sumarDias(hoy, 7)
+
+  useEffect(() => {
+    let vigente = true
+
+    obtenerOrganizador()
+      .then((organizador) => {
+        if (!vigente) return
+
+        const valor = Number(organizador.limite_diario_horas)
+
+        setLimiteDiario(
+          Number.isFinite(valor) && valor > 0 ? valor : null,
+        )
+      })
+      .catch(() => {
+        if (vigente) setLimiteDiario(null)
+      })
+
+    return () => {
+      vigente = false
+    }
+  }, [])
 
   useEffect(() => {
     let vigente = true
@@ -188,6 +216,19 @@ export default function Hoy() {
     return gestiones.filter((gestion) => (gestion.estado ?? 'PENDIENTE') !== 'EJECUTADA')
   }, [gestiones])
 
+  const horasProgramadasHoy = useMemo(() => {
+    return activas
+      .filter((gestion) => gestion.fecha_objetivo === hoy)
+      .reduce((total, gestion) => {
+        const horas = Number(gestion.horas_estimadas)
+        return total + (Number.isFinite(horas) ? horas : 0)
+      }, 0)
+  }, [activas, hoy])
+
+  const haySobrecargaHoy =
+    limiteDiario !== null &&
+    horasProgramadasHoy > limiteDiario
+
   const enVentana = useMemo(() => {
     return ordenarGestiones(activas.filter((gestion) => gestion.fecha_objetivo <= limite))
   }, [activas, limite])
@@ -244,26 +285,30 @@ export default function Hoy() {
     }
   }
 
-  async function confirmarPosposicion(nota) {
+  async function confirmarPosposicion({ datos, nota, fechaObjetivo }) {
     const gestion = posponiendo
-    const datos = { estado: 'POSPUESTA' }
-    if (nota) datos.nota_posposicion = nota
-    const actualizada = await actualizarSubtarea(gestion.eventoId, gestion.id, datos)
+    const actualizada = await actualizarSubtarea(
+      gestion.eventoId,
+      gestion.id,
+      datos,
+    )
+
     aplicarAvance(actualizada, gestion)
     setPosponiendo(null)
+
+    const fechaFinal = actualizada.fecha_objetivo ?? fechaObjetivo ?? gestion.fecha_objetivo
+
     setAvisoReprogramada({
       titulo: 'Gestión pospuesta.',
-      mensaje: nota
-        ? `${gestion.nombre} quedó pospuesta: ${nota}`
-        : `${gestion.nombre} quedó pospuesta y sigue en su fecha.`,
+      mensaje: `${gestion.nombre} quedó pospuesta para el ${formatearFecha(fechaFinal)}.${nota ? ` Nota: ${nota}` : ''}`,
     })
   }
 
-  function limpiarFiltros() {
-    setFiltroEvento('')
-    setFiltroEstado('')
-    filtroEventoRef.current?.focus()
-  }
+    function limpiarFiltros() {
+      setFiltroEvento('')
+      setFiltroEstado('')
+      filtroEventoRef.current?.focus()
+    }
 
   return (
     <section className="pagina">
@@ -396,9 +441,14 @@ export default function Hoy() {
             return (
               <section
                 key={id}
-                className={`grupo-prioridad grupo-${id.toLowerCase()} ${id === 'PROXIMA' ? 'grupo-segundo-plano' : 'grupo-primer-plano'}`}
+                className={`grupo-prioridad grupo-${id.toLowerCase()} ${id === 'PROXIMA' ? 'grupo-segundo-plano' : 'grupo-primer-plano'} ${id === 'PARA_HOY' && haySobrecargaHoy ? 'grupo-sobrecarga' : ''}`}
                 aria-labelledby={`grupo-${id}`}
               >
+                { id === 'PARA_HOY' && haySobrecargaHoy && (
+                  <p className="aviso-sobrecarga" role="alert">
+                    Cuidado, tienes sobrecarga de trabajo, por favor reprogramar subtareas
+                  </p>
+                )}
                 <h2 id={`grupo-${id}`}>{TITULOS[id]} · {lista.length}</h2>
                 {lista.length === 0 && (
                   <p className="apoyo-grupo">{filtrosActivos ? VACIO_FILTRO[id] : VACIO[id]}</p>
@@ -475,6 +525,11 @@ export default function Hoy() {
       {posponiendo && (
         <DialogoPosponer
           nombre={posponiendo.nombre}
+          eventoId={posponiendo.eventoId}
+          subtareaId={posponiendo.id}
+          fechaEvento={fechaDeIso(
+            eventos.find((evento) => evento.id === posponiendo.eventoId)?.fecha_hora_evento
+          )}
           onCerrar={() => setPosponiendo(null)}
           onConfirmar={confirmarPosposicion}
         />

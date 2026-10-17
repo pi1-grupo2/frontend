@@ -399,6 +399,22 @@ h3 { margin: 0; font-size: 1.05rem; }
 .grupo-prioridad .lista-gestiones { margin-top: 0.55rem; }
 .grupo-vencida .tarjeta-gestion { border-left: 4px solid #c2410c; }
 .grupo-para_hoy .tarjeta-gestion { border-left: 4px solid #334155; }
+/* Alerta cuando las gestiones pendientes de hoy superan el límite diario. */
+.grupo-sobrecarga {
+  background-color: #fef2f2;
+  border: 1px solid #dc2626;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.aviso-sobrecarga {
+  margin: 0 0 0.75rem;
+  padding: 0.85rem 1rem;
+  background-color: #dc2626;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 700;
+}
 .tarjeta-compacta { box-shadow: none; }
 .fecha-gestion { margin: 0 0 0.35rem; font-weight: 700; }
 .grupo-vencida .fecha-gestion { color: #9a3412; }

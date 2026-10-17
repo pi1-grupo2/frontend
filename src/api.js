@@ -134,6 +134,12 @@ export function actualizarSubtarea(eventoId, subtareaId, datos) {
   })
 }
 
+export function obtenerSugerenciaPosponer(eventoId, subtareaId) {
+  return solicitar(
+    `/events/${eventoId}/subtasks/${subtareaId}/sugerencia-posponer/`
+  )
+}
+
 export function eliminarSubtarea(eventoId, subtareaId) {
   return solicitar(`/events/${eventoId}/subtasks/${subtareaId}/`, { method: 'DELETE' })
 }
