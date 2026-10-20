@@ -27,6 +27,12 @@ import {
   textoConflictoResuelto,
 } from '../formato'
 
+function mensajeEliminarEvento(nombre, cantidad) {
+  if (cantidad === 1) return `Se eliminará «${nombre}» y su gestión. No se puede deshacer.`
+  if (cantidad > 1) return `Se eliminará «${nombre}» y sus ${cantidad} gestiones. No se puede deshacer.`
+  return `Se eliminará «${nombre}». No se puede deshacer.`
+}
+
 export default function EventoDetalle() {
   const { id } = useParams()
   const navegar = useNavigate()
@@ -181,6 +187,8 @@ export default function EventoDetalle() {
   }
 
   async function confirmarEliminacion() {
+    const nombreGestion = modal.subtarea?.nombre
+    const nombreEvento = evento.nombre
     setEliminando(true)
     try {
       if (modal.tipo === 'evento') {
@@ -188,8 +196,8 @@ export default function EventoDetalle() {
         navegar('/eventos', {
           state: {
             toast: {
-              titulo: 'Elemento eliminado',
-              mensaje: 'El registro fue eliminado correctamente del sistema.',
+              titulo: 'Evento eliminado.',
+              mensaje: `«${nombreEvento}» ya no está en Mis eventos.`,
             },
           },
         })
@@ -198,8 +206,8 @@ export default function EventoDetalle() {
       await eliminarSubtarea(id, modal.subtarea.id)
       setModal(null)
       setToast({
-        titulo: 'Elemento eliminado',
-        mensaje: 'El registro fue eliminado correctamente del sistema.',
+        titulo: 'Gestión eliminada.',
+        mensaje: `«${nombreGestion}» ya no está en el plan.`,
       })
       const lista = await listarSubtareas(id)
       setSubtareas(lista)
@@ -560,10 +568,10 @@ export default function EventoDetalle() {
         titulo={modal?.tipo === 'gestion' ? '¿Eliminar esta gestión?' : '¿Eliminar este evento?'}
         mensaje={
           modal?.tipo === 'gestion'
-            ? 'Esta subtarea logística se removerá del plan y sus horas se descontarán del cálculo de capacidad del día.'
-            : `Esta acción eliminará permanentemente el evento "${evento.nombre}" y todas sus ${subtareas.length} gestiones logísticas asociadas. No se puede deshacer.`
+            ? `Se eliminará «${modal.subtarea.nombre}» del plan de este evento. No se puede deshacer.`
+            : mensajeEliminarEvento(evento?.nombre, subtareas.length)
         }
-        textoConfirmar={modal?.tipo === 'gestion' ? 'Eliminar' : 'Eliminar evento'}
+        textoConfirmar={modal?.tipo === 'gestion' ? 'Eliminar gestión' : 'Eliminar evento'}
         onConfirmar={confirmarEliminacion}
         onCancelar={() => setModal(null)}
         cargando={eliminando}

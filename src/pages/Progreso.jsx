@@ -48,7 +48,7 @@ export default function Progreso() {
       {estado === 'error' && (
         <div className="aviso aviso-error" role="alert">
           <h2>No se pudo cargar el progreso</h2>
-          <p>No llegaron los datos de tus eventos. Revisa la conexión e intenta de nuevo.</p>
+          <p>Ocurrió un problema al obtener la información. Si el error continúa, conviene revisar la conexión a internet.</p>
           <button type="button" className="boton boton-primario" onClick={() => setConsulta((n) => n + 1)}>
             Reintentar
           </button>
@@ -57,8 +57,8 @@ export default function Progreso() {
 
       {estado === 'listo' && eventos.length === 0 && (
         <div className="estado-vacio" role="status">
-          <h2>Todavía no tienes eventos</h2>
-          <p>Crea un evento y su plan logístico para ver cuánto falta para tenerlo listo.</p>
+          <h2>Sin eventos todavía</h2>
+          <p>El progreso de cada evento aparece aquí cuando ya tiene un plan.</p>
           <Link className="boton boton-primario" to="/crear">Crear evento</Link>
         </div>
       )}

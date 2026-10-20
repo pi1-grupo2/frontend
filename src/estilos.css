@@ -413,8 +413,10 @@ h3 { margin: 0; font-size: 1.05rem; }
   background-color: #dc2626;
   color: #ffffff;
   border-radius: 6px;
-  font-weight: 700;
 }
+.aviso-sobrecarga p { margin: 0; color: #ffffff; }
+.aviso-sobrecarga-titulo { font-weight: 700; }
+.aviso-sobrecarga-apoyo { margin-top: 0.35rem; font-weight: 500; }
 .tarjeta-compacta { box-shadow: none; }
 .fecha-gestion { margin: 0 0 0.35rem; font-weight: 700; }
 .grupo-vencida .fecha-gestion { color: #9a3412; }

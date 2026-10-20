@@ -445,9 +445,12 @@ export default function Hoy() {
                 aria-labelledby={`grupo-${id}`}
               >
                 { id === 'PARA_HOY' && haySobrecargaHoy && (
-                  <p className="aviso-sobrecarga" role="alert">
-                    Cuidado, tienes sobrecarga de trabajo, por favor reprogramar subtareas
-                  </p>
+                  <div className="aviso-sobrecarga" role="alert">
+                    <p className="aviso-sobrecarga-titulo">Este día supera el límite de horas.</p>
+                    <p className="aviso-sobrecarga-apoyo">
+                      Hay {formatearHoras(horasProgramadasHoy)} planificadas y el límite es {formatearHoras(limiteDiario)}. Reprogramar o reducir horas deja el día dentro del límite.
+                    </p>
+                  </div>
                 )}
                 <h2 id={`grupo-${id}`}>{TITULOS[id]} · {lista.length}</h2>
                 {lista.length === 0 && (
