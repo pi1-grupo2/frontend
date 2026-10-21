@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { actualizarOrganizador, obtenerOrganizador } from '../api'
 import Toast from '../components/Toast'
 import { formatearHoras } from '../formato'
@@ -7,7 +8,6 @@ const LIMITE_MINIMO = 1
 const LIMITE_MAXIMO = 16
 const PASO = 0.5
 
-// Textos provisionales. Los definitivos los entrega UX (tarea #231): se cambian aquí.
 const TEXTOS = {
   titulo: 'Configuración',
   intro:
@@ -28,6 +28,16 @@ const TEXTOS = {
   errorGuardarTitulo: 'No fue posible guardar el límite.',
   errorGuardarApoyo: 'El valor escrito se conserva. Intentar de nuevo en unos minutos.',
   exitoTitulo: 'Límite actualizado.',
+  conflictoTitulo: 'Ese límite dejaría días por encima.',
+  revisarDias: 'Revisar esos días',
+  guardarConSobrecarga: 'Guardar aunque supere el límite',
+  conservar: 'Conservar el límite actual',
+}
+
+function textoDiasPorEncima(limite, dias) {
+  const horas = formatearHoras(limite)
+  if (dias === 1) return `Con ${horas}, 1 día quedaría por encima del límite.`
+  return `Con ${horas}, ${dias} días quedarían por encima del límite.`
 }
 
 // "6,5" y "6.5" son el mismo límite. La ayuda del campo usa la coma.
@@ -49,11 +59,13 @@ function validarLimite(texto) {
 
 export default function Configuracion() {
   const campoRef = useRef(null)
+  const conservarRef = useRef(null)
   const [estado, setEstado] = useState('cargando') // cargando | error | listo
   const [limiteActual, setLimiteActual] = useState(null)
   const [valor, setValor] = useState('')
   const [errorCampo, setErrorCampo] = useState('')
   const [errorGuardar, setErrorGuardar] = useState(false)
+  const [conflicto, setConflicto] = useState(null)
   const [guardando, setGuardando] = useState(false)
   const [toast, setToast] = useState(null)
   const cerrarToast = useCallback(() => setToast(null), [])
@@ -81,8 +93,28 @@ export default function Configuracion() {
 
   useEffect(() => cargar(), [cargar])
 
-  async function guardar(evento) {
-    evento.preventDefault()
+  function conservarLimite() {
+    setConflicto(null)
+    setValor(limiteActual === null ? '' : String(limiteActual))
+    setErrorCampo('')
+  }
+
+  useEffect(() => {
+    if (!conflicto) return undefined
+    conservarRef.current?.focus()
+    function tecla(evento) {
+      if (evento.key !== 'Escape') return
+      evento.preventDefault()
+      setConflicto(null)
+      setValor(limiteActual === null ? '' : String(limiteActual))
+      setErrorCampo('')
+    }
+    document.addEventListener('keydown', tecla)
+    return () => document.removeEventListener('keydown', tecla)
+  }, [conflicto, limiteActual])
+
+  async function guardar(evento, confirmar = false) {
+    evento?.preventDefault?.()
     setErrorGuardar(false)
 
     const fallo = validarLimite(valor)
@@ -94,19 +126,29 @@ export default function Configuracion() {
 
     setGuardando(true)
     try {
-      const organizador = await actualizarOrganizador({
-        limite_diario_horas: Number(normalizarLimite(valor)),
-      })
+      const cuerpo = { limite_diario_horas: Number(normalizarLimite(valor)) }
+      if (confirmar) cuerpo.confirmar_sobrecarga = true
+      const organizador = await actualizarOrganizador(cuerpo)
       const limite = Number(organizador.limite_diario_horas)
       setLimiteActual(limite)
       setValor(String(limite))
+      setConflicto(null)
       setToast({
         titulo: TEXTOS.exitoTitulo,
         mensaje: `El aviso de sobrecarga usa ahora ${formatearHoras(limite)} por día.`,
       })
     } catch (error) {
+      const datos = error.datos
+      if (!confirmar && error.status === 409 && datos?.codigo === 'sobrecarga_por_limite') {
+        const dias = Array.isArray(datos.dias) ? datos.dias.length : 0
+        setConflicto({
+          limite: datos.limite_diario_horas ?? Number(normalizarLimite(valor)),
+          dias: dias > 0 ? dias : 1,
+        })
+        return
+      }
       // Si la API rechaza el valor, su mensaje va en el campo. Cualquier otro fallo es del servicio.
-      const rechazo = error.status === 400 ? error.datos?.limite_diario_horas?.[0] : null
+      const rechazo = error.status === 400 ? datos?.limite_diario_horas?.[0] : null
       if (rechazo) {
         setErrorCampo(rechazo)
         campoRef.current?.focus()
@@ -186,11 +228,48 @@ export default function Configuracion() {
 
           <div className="acciones-formulario">
             <button type="submit" className="boton boton-primario" disabled={guardando}>
-              {guardando && <span className="spinner" aria-hidden="true" />}
-              {guardando ? TEXTOS.guardando : TEXTOS.guardar}
+              {guardando && !conflicto && <span className="spinner" aria-hidden="true" />}
+              {guardando && !conflicto ? TEXTOS.guardando : TEXTOS.guardar}
             </button>
           </div>
         </form>
+      )}
+
+      {conflicto && (
+        <div className="modal-fondo" onClick={conservarLimite}>
+          <div
+            className="modal"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="limite-conflicto-titulo"
+            aria-describedby="limite-conflicto-mensaje"
+            onClick={(evento) => evento.stopPropagation()}
+          >
+            <h2 id="limite-conflicto-titulo">{TEXTOS.conflictoTitulo}</h2>
+            <p id="limite-conflicto-mensaje">{textoDiasPorEncima(conflicto.limite, conflicto.dias)}</p>
+            <div className="modal-acciones">
+              <Link className="boton boton-primario" to="/hoy">{TEXTOS.revisarDias}</Link>
+              <button
+                type="button"
+                className="boton boton-secundario"
+                disabled={guardando}
+                onClick={() => guardar(null, true)}
+              >
+                {guardando && <span className="spinner" aria-hidden="true" />}
+                {guardando ? TEXTOS.guardando : TEXTOS.guardarConSobrecarga}
+              </button>
+              <button
+                ref={conservarRef}
+                type="button"
+                className="boton boton-secundario"
+                disabled={guardando}
+                onClick={conservarLimite}
+              >
+                {TEXTOS.conservar}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   )
