@@ -11,20 +11,27 @@ export default function ModalConfirmacion({
 }) {
   const cancelarRef = useRef(null)
   const confirmarRef = useRef(null)
-
+  const focoAnteriorRef = useRef(null)
   useEffect(() => {
     if (!abierto) return undefined
-
+    
+    focoAnteriorRef.current = document.activeElement
+    focoAnteriorRef.current = document.activeElement
     // El foco inicial queda en Cancelar aunque no sea el primer botón:
     // en una confirmación de borrado, la opción segura debe ser la que responde a Enter.
     cancelarRef.current?.focus()
 
     function alTeclado(evento) {
-      if (evento.key === 'Escape') {
-        evento.preventDefault()
-        onCancelar()
-        return
-      }
+      
+if (evento.key === 'Escape') {
+  evento.preventDefault()
+  onCancelar()
+  requestAnimationFrame(() => {
+    focoAnteriorRef.current?.focus()
+  })
+  return
+}
+
 
       if (evento.key !== 'Tab') return
 

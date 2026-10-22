@@ -498,7 +498,7 @@ export default function EventoDetalle() {
                     <button
                       type="button"
                       className="boton boton-secundario"
-                      aria-label={`Marcar ${subtarea.nombre} como ejecutada`}
+                      aria-label={`Marcar como ejecutada: ${subtarea.nombre}`}
                       onClick={() => marcarEjecutada(subtarea)}
                     >
                       Marcar como ejecutada
@@ -515,11 +515,12 @@ export default function EventoDetalle() {
                     </button>
                   )}
                   <button
-                    type="button"
-                    className="boton boton-peligro"
-                    onClick={() => setModal({ tipo: 'gestion', subtarea })}
-                  >
-                    Eliminar
+                  type="button"
+                  className="boton boton-peligro"
+                  aria-label={`Eliminar ${subtarea.nombre}`}
+                   onClick={() => setModal({ tipo: 'gestion', subtarea })}
+                    >
+                   Eliminar
                   </button>
                 </div>
               </li>
