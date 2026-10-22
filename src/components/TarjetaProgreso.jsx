@@ -33,18 +33,39 @@ export default function TarjetaProgreso({ progreso, cargando, error, onReintenta
   const hechas = progreso?.subtareas_ejecutadas ?? 0
   const porcentaje = progreso?.progreso ?? 0
 
-  if (total === 0) {
-    return (
-      <section className="tarjeta-progreso tarjeta-progreso-vacio" role="status">
-        <div className="circulo-progreso" aria-label="0 por ciento">0%</div>
-        <div>
-          <h2>Progreso de preparación</h2>
-          <p>Este evento aún no tiene gestiones. Agrégalas en el detalle para empezar a medir el avance.</p>
-          <div className="barra-progreso" aria-hidden="true" />
-        </div>
-      </section>
-    )
-  }
+if (total === 0) {
+  return (
+    <section
+      className="tarjeta-progreso tarjeta-progreso-vacio"
+      role="status"
+      aria-live="polite"
+    >
+      <div
+        className="circulo-progreso"
+        role="img"
+        aria-label="Progreso: 0 por ciento"
+      >
+        0%
+      </div>
+
+      <div className="contenido-progreso-vacio">
+        <h2>Progreso de preparación</h2>
+        <p>
+          Este evento aún no tiene gestiones. Agrégalas en el detalle
+          para empezar a medir el avance.
+        </p>
+        <div
+          className="barra-progreso"
+          role="progressbar"
+          aria-label="Progreso de preparación"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={0}
+        />
+      </div>
+    </section>
+  )
+}
 
   return (
     <section className="tarjeta-progreso" role="status">

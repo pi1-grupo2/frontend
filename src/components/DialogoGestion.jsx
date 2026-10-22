@@ -342,9 +342,18 @@ export default function DialogoGestion({ modo, gestion, eventoId, fechaEvento, o
         )}
 
         {conflicto && (
-          <div className="conflicto">
-            {/* La advertencia no depende del color: lleva icono, título y las cifras en texto. */}
-            <div className="aviso aviso-advertencia" role="alert">
+<div className="conflicto">
+  {/* Aviso accesible con opción para volver al formulario. */}
+  <div className="aviso aviso-advertencia aviso-sobrecarga" role="alert">
+    <button
+      type="button"
+      className="cerrar-aviso-sobrecarga"
+      aria-label="Cerrar aviso de sobrecarga y volver al formulario"
+      onClick={() => volverAlFormulario()}
+      disabled={guardando}
+    >
+      <span aria-hidden="true">×</span>
+    </button>
               <h3 ref={tituloConflictoRef} tabIndex={-1}>
                 <span aria-hidden="true">⚠ </span>
                 {TEXTOS.tituloConflicto}

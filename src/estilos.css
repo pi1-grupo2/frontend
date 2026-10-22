@@ -471,6 +471,42 @@ h3 { margin: 0; font-size: 1.05rem; }
 /* Aviso de sobrecarga. Es una advertencia, no un error: ámbar y no rojo, porque no bloquea.
    El color no lleva el mensaje solo: van el icono, el título y las cifras escritas. */
 .aviso-advertencia { background: #fffbeb; border-color: #f59e0b; border-left-width: 4px; }
+.aviso-sobrecarga {
+  position: relative;
+  padding-right: 3rem;
+}
+
+.cerrar-aviso-sobrecarga {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #92400e;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: #78350f;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cerrar-aviso-sobrecarga:hover {
+  background: #fef3c7;
+}
+
+.cerrar-aviso-sobrecarga:focus-visible {
+  outline: 3px solid #78350f;
+  outline-offset: 2px;
+}
+
+.cerrar-aviso-sobrecarga:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .aviso-advertencia h3 { margin: 0; font-size: 1.05rem; color: #78350f; }
 /* El título recibe el foco al aparecer el aviso para que se anuncie. No es un control, así que no lleva contorno. */
 .aviso-advertencia h3:focus { outline: none; }
@@ -591,3 +627,46 @@ h3 { margin: 0; font-size: 1.05rem; }
 .lista-progreso { list-style: none; margin: 0; padding: 0; }
 .lista-progreso li { margin-bottom: 1.25rem; }
 .enlace-progreso { margin: -0.4rem 0 0; }
+.aviso-sobrecarga {
+  position: relative;
+  padding-right: 3rem;
+}
+.cerrar-aviso-sobrecarga {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid currentColor;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cerrar-aviso-sobrecarga:hover {
+  opacity: 0.75;
+}
+
+.cerrar-aviso-sobrecarga:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+.aviso-sobrecarga,
+.aviso-sobrecarga h2,
+.aviso-sobrecarga p {
+  color: #000;
+}
+.tarjeta-progreso-vacio .contenido-progreso-vacio {
+  flex: 1;
+  min-width: 0;
+}
+
+.tarjeta-progreso-vacio .barra-progreso {
+  width: 100%;
+}

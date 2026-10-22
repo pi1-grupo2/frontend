@@ -38,7 +38,7 @@ export default function Crear() {
   const [erroresSubtareas, setErroresSubtareas] = useState({})
   const [avisoPlan, setAvisoPlan] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [hasError, setHasError] = useState(false)
+ const [errorGuardado, setErrorGuardado] = useState(null)
   const [eventoIdParcial, setEventoIdParcial] = useState(null)
 
   function validar() {
@@ -105,12 +105,12 @@ export default function Crear() {
         subtarea.clave === clave ? { ...subtarea, [campo]: valor } : subtarea,
       ),
     )
-    setHasError(false)
+    setErrorGuardado(null)
   }
 
   async function handleSubmit(evento) {
     evento.preventDefault()
-    setHasError(false)
+    setErrorGuardado(null)
 
     const resultado = validar()
     setErrores(resultado.erroresFormulario)
@@ -180,12 +180,26 @@ if (
           },
         },
       })
-    } catch {
-      setHasError(true)
-    } finally {
-      setIsLoading(false)
-    }
+
+
+} catch (error) {
+  const respuesta = error?.datos ?? {}
+
+  if (error?.status === 409 && respuesta.codigo === 'sobrecarga_diaria') {
+    setErrorGuardado({
+      tipo: 'sobrecarga',
+      mensaje: `Ese día quedaría con ${respuesta.horas_planificadas} horas planificadas, superando el límite de ${respuesta.limite_diario_horas} horas. No se guardó la gestión.`,
+    })
+  } else {
+    setErrorGuardado({
+      tipo: 'general',
+      mensaje: 'Tuvimos un inconveniente al conectar con el servidor. Tus datos no se perdieron; intenta nuevamente.',
+    })
   }
+} finally {
+  setIsLoading(false)
+}
+ }
 
   return (
     <section className="pagina">
@@ -195,18 +209,44 @@ if (
         Define las coordenadas de tu celebración y estructura su plan logístico inicial con subtareas.
       </p>
 
-      {hasError && (
-        <div className="aviso aviso-error" role="alert">
-          <h2>No se pudo guardar</h2>
-          <p>
-            Tuvimos un inconveniente al conectar con el servidor.
-            Tus datos no se perdieron; intenta nuevamente.
-          </p>
-          <button type="button" className="boton boton-primario" onClick={() => setHasError(false)}>
-            Reintentar
-          </button>
-        </div>
-      )}
+      
+{errorGuardado && (
+  <div
+    className={`aviso ${
+      errorGuardado.tipo === 'sobrecarga'
+        ? 'aviso-advertencia aviso-sobrecarga'
+        : 'aviso-error'
+    }`}
+    role="alert"
+  >
+    <button
+      type="button"
+      className="cerrar-aviso-sobrecarga"
+      aria-label="Cerrar aviso"
+      onClick={() => setErrorGuardado(null)}
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+
+    <h2>
+      {errorGuardado.tipo === 'sobrecarga'
+        ? 'Límite diario de horas superado'
+        : 'No se pudo guardar'}
+    </h2>
+
+    <p>{errorGuardado.mensaje}</p>
+
+    {errorGuardado.tipo === 'general' && (
+      <button
+        type="button"
+        className="boton boton-primario"
+        onClick={() => setErrorGuardado(null)}
+      >
+        Reintentar
+      </button>
+    )}
+  </div>
+)}
 
       {isLoading && (
         <p className="estado-carga" role="status">
@@ -433,3 +473,4 @@ if (
     </section>
   )
 }
+

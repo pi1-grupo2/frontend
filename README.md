@@ -1,78 +1,139 @@
-# Frontend · Organizador de Eventos Independientes
+# Frontend · EvenFlow — Organizador de Eventos Independientes
 
-SPA del Miniproyecto 1 de Proyecto Integrador I (750018C). Grupo 2, Universidad del Valle,
-semestre 2026-2.
+Aplicación web de una sola página (SPA) del Miniproyecto 1 de Proyecto Integrador I (750018C), Grupo 2, Universidad del Valle, semestre 2026-2.
 
-## Stack
+EvenFlow permite organizar eventos y gestionar sus actividades, fechas, horas estimadas y progreso, con el objetivo de facilitar la planificación y detectar posibles sobrecargas en la jornada.
 
-- React con Vite
-- React Router
-- Desplegado en Vercel
+## Stack tecnológico
+
+- **React** para la construcción de la interfaz.
+- **Vite** como herramienta de desarrollo y compilación.
+- **React Router** para la navegación entre vistas.
+- **JavaScript y CSS** para la lógica y los estilos de la aplicación.
+- **API REST** para la comunicación con el backend.
+- **Vercel** para el despliegue del frontend.
+
+## Requisitos previos
+
+- Node.js y npm instalados.
+- Acceso al repositorio del frontend.
+- Backend disponible para probar las funcionalidades que requieren comunicación con la API.
 
 ## Arranque local
+
+Clona el repositorio e instala las dependencias:
 
 ```bash
 git clone https://github.com/pi1-grupo2/frontend.git
 cd frontend
-
 npm install
-cp .env.example .env       # apuntar VITE_API_URL a la API
+```
+
+Configura las variables de entorno creando un archivo `.env` en la raíz del proyecto:
+
+```env
+VITE_API_URL=http://127.0.0.1:8000/api
+```
+
+Si se utiliza un backend desplegado, reemplaza la URL por la dirección base correspondiente de la API.
+
+Inicia el servidor de desarrollo:
+
+```bash
 npm run dev
 ```
 
-Queda en http://localhost:5173. El pie de página muestra si la API responde y si la base de datos
-está viva.
+Vite mostrará en la terminal la dirección local de la aplicación, normalmente:
 
-## Rutas
+http://localhost:5173
 
-Son las que define la arquitectura de información del Sprint 0. Hoy son pantallas vacías: el
-criterio C7 pide que la SPA corra, no que las vistas estén implementadas.
+## Rutas de la aplicación
 
-| Ruta | Para qué | Entra en |
-| --- | --- | --- |
-| `/hoy` | Gestiones urgentes del día, vencidas y próximas | Sprint 2 |
-| `/crear` | Crear evento y plan inicial de subtareas | Sprint 1 |
-| `/evento/:id` | Detalle, edición, reprogramación y conflicto | Sprints 1 y 3 |
-| `/progreso` | Barra de progreso por evento | Sprint 4 |
-| `/login` | Autenticación con correo y contraseña | Sprint 2 |
+| Ruta | Descripción |
+|---|---|
+| `/hoy` | Consulta las gestiones del día, las actividades vencidas y las próximas. Incluye organización de actividades y acciones de gestión según la implementación disponible. |
+| `/crear` | Formulario para crear un evento y registrar sus datos y actividades iniciales. |
+| `/evento/:id` | Consulta y gestión de un evento específico, incluida la edición y reprogramación de actividades cuando están disponibles. |
+| `/progreso` | Consulta el avance de los eventos y sus actividades. |
+| `/login` | Acceso a la aplicación mediante autenticación, según la configuración del backend. |
+
+## Funcionalidades
+
+### Gestión de eventos y actividades
+
+- Creación y consulta de eventos.
+- Registro y gestión de actividades o subtareas.
+- Consulta del detalle de cada evento.
+- Edición y reprogramación de actividades, de acuerdo con las operaciones disponibles en la API.
+
+### Vista Hoy y organización de la jornada
+
+- Organización de las actividades según su estado y fecha.
+- Identificación de actividades vencidas y próximas.
+- Visualización de información relevante para priorizar el trabajo diario.
+- Manejo de situaciones de sobrecarga diaria y acciones para resolverlas, según la integración disponible con el backend.
+
+### Seguimiento del progreso
+
+- Consulta del avance de los eventos.
+- Visualización del estado de las actividades para facilitar el seguimiento de la planificación.
+
+### Manejo de errores y estados de interfaz
+
+La interfaz contempla estados de carga, errores y confirmaciones en las operaciones que lo requieren. Las respuestas de la API determinan los resultados de las operaciones y las validaciones que se muestran al usuario.
 
 ## Variables de entorno
 
-| Variable | Para qué sirve |
-| --- | --- |
-| `VITE_API_URL` | URL base de la API, terminada en `/api` |
+| Variable | Descripción |
+|---|---|
+| `VITE_API_URL` | URL base del backend, terminada en `/api`. |
 
-En Vite solo las variables con prefijo `VITE_` llegan al navegador, y por eso mismo quedan visibles
-en el bundle que descarga el usuario. Nunca poner secretos ahí.
+Vite expone al navegador las variables cuyo nombre comienza por `VITE_`. Por lo tanto, no deben incluirse contraseñas, tokens privados ni otras credenciales secretas en estas variables.
 
-## Sobre `vercel.json`
+El archivo `.env` local no debe subirse al repositorio si contiene información privada. Se recomienda mantener un `.env.example` con las variables necesarias y valores de ejemplo no sensibles.
 
-Contiene una reescritura que manda todas las rutas a `index.html`. Sin eso, entrar directo a `/hoy`
-o recargar esa página devuelve 404 en Vercel, porque el servidor busca un archivo que no existe. En
-una SPA el enrutamiento lo resuelve el navegador, no el servidor.
+## Enrutamiento de la SPA
+
+El archivo `vercel.json` debe mantener la configuración necesaria para que las rutas de React Router funcionen al acceder directamente a una URL o recargar una vista desplegada.
+
+En una SPA, React Router administra la navegación en el navegador. El servidor debe redirigir las rutas de la aplicación a `index.html` para evitar respuestas 404 al acceder directamente a rutas como `/hoy` o `/evento/:id`.
 
 ## Accesibilidad
 
-C.E.5 es competencia evaluada y TS-06 dice que la accesibilidad es transversal desde temprano. El
-esqueleto ya trae `lang="es"`, enlace para saltar al contenido, foco visible con `:focus-visible`,
-la ruta activa marcada con negrita además del color, y `role="status"` en el bloque que cambia solo.
+La accesibilidad es un aspecto transversal del desarrollo de EvenFlow y forma parte de los criterios de evaluación del proyecto.
 
-Al reemplazar los estilos, conservar el bloque de foco visible.
+Se debe conservar y verificar, según la implementación actual:
+
+- Idioma español declarado en el documento HTML.
+- Enlace para saltar al contenido principal.
+- Indicadores de foco visibles para la navegación con teclado.
+- Identificación de la ruta activa sin depender exclusivamente del color.
+- Uso adecuado de regiones y mensajes de estado accesibles.
+- Etiquetas y controles comprensibles para formularios y diálogos.
+- Posibilidad de cerrar diálogos mediante el teclado cuando corresponda.
+
+Al modificar los estilos globales, se deben conservar los indicadores de foco y los demás recursos de accesibilidad existentes.
 
 ## Convenciones de trabajo
 
-- Commits en formato Conventional Commits
-- Ramas: `feature/<descripcion>-<iniciales>`
-- `main` está protegida. Nada entra sin pull request aprobado por otra persona
-- Los comentarios del PR se resuelven antes de fusionar
+- Utilizar commits con el formato Conventional Commits.
+- Crear ramas de trabajo siguiendo las convenciones acordadas por el equipo.
+- Integrar cambios a `main` mediante pull requests.
+- Respetar la protección de la rama principal y los requisitos de aprobación.
+- Resolver los comentarios de revisión antes de fusionar los cambios.
+- Mantener la documentación actualizada conforme evolucionen las funcionalidades.
 
 ## Despliegue
 
-| Entorno | URL |
-| --- | --- |
-| Frontend en producción | pendiente |
-| API | pendiente |
+| Entorno | Dirección |
+|---|---|
+| Frontend | Consultar la URL vigente del despliegue en Vercel. |
+| Backend | Consultar la URL vigente de la API y su configuración de entorno. |
 
-## Estado
+La disponibilidad del frontend no garantiza que el backend o la base de datos estén funcionando. Las funcionalidades que dependen de estos servicios requieren que la API esté accesible y correctamente configurada.
 
-Sprint 0. Base técnica operativa (TS-01). Las vistas entran desde el Sprint 1.
+## Estado del proyecto
+
+Frontend en desarrollo evolutivo durante el semestre 2026-2. Las funcionalidades se implementan y verifican progresivamente mediante las historias de usuario, tareas y criterios de aceptación de los sprints del Miniproyecto 1.
+
+Este README describe la arquitectura y las funcionalidades previstas o trabajadas en la aplicación. La disponibilidad exacta de cada operación depende de la implementación vigente del frontend y de su integración con el backend.
