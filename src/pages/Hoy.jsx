@@ -89,6 +89,7 @@ export default function Hoy() {
   const ubicacion = useLocation()
   const filtroEventoRef = useRef(null)
   const cerrarReglaRef = useRef(null)
+  const abrirReglaRef = useRef(null)
   const tituloRef = useRef(null)
   const [cuentaCreada, setCuentaCreada] = useState(Boolean(ubicacion.state?.cuentaCreada))
   const [eventos, setEventos] = useState([])
@@ -163,15 +164,25 @@ export default function Hoy() {
     }
   }, [consulta])
 
+
   useEffect(() => {
     if (!reglaAbierta) return undefined
+
     cerrarReglaRef.current?.focus()
+
     function tecla(evento) {
-      if (evento.key === 'Escape') setReglaAbierta(false)
+      if (evento.key === 'Escape') {
+        evento.preventDefault()
+        setReglaAbierta(false)
+        abrirReglaRef.current?.focus()
+      }
     }
+
     window.addEventListener('keydown', tecla)
+
     return () => window.removeEventListener('keydown', tecla)
   }, [reglaAbierta])
+
 
   // Al reprogramar, la tarjeta cambia de grupo y el botón que abrió el diálogo desaparece.
   // El foco se lleva a la tarjeta en su nuevo lugar o, si ya no está en pantalla, al título de la página.
@@ -322,6 +333,7 @@ export default function Hoy() {
       {!cargando && !error && (
         <div className="regla-orden">
           <button
+          ref={abrirReglaRef}
             type="button"
             className="enlace-boton"
             aria-expanded={reglaAbierta}
@@ -484,7 +496,7 @@ export default function Hoy() {
                           <button
                             type="button"
                             className="boton boton-secundario"
-                            aria-label={`Marcar ${gestion.nombre} como ejecutada`}
+                            aria-label={`Marcar como ejecutada: ${gestion.nombre}`}
                             onClick={() => marcarEjecutada(gestion)}
                           >
                             Marcar como ejecutada

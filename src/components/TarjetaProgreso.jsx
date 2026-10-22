@@ -60,9 +60,18 @@ export default function TarjetaProgreso({ progreso, cargando, error, onReintenta
           {hechas} de {total} gestiones ejecutadas
           {progreso?.nombre ? ` en ${progreso.nombre}` : ''}
         </p>
-        <div className="barra-progreso" aria-hidden="true">
-          <span style={{ width: `${porcentaje}%` }} />
-        </div>
+        
+<div
+  className="barra-progreso"
+  role="progressbar"
+  aria-label="Progreso de preparación"
+  aria-valuenow={porcentaje}
+  aria-valuemin={0}
+  aria-valuemax={100}
+>
+  <span style={{ width: `${porcentaje}%` }} />
+</div>
+
       </div>
     </section>
   )

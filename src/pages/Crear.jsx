@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   crearEvento,
@@ -26,6 +26,7 @@ function nuevaSubtarea() {
 
 export default function Crear() {
   const navegar = useNavigate()
+  const formularioRef = useRef(null)
   const [nombre, setNombre] = useState('')
   const [tipo, setTipo] = useState('')
   const [contacto, setContacto] = useState('')
@@ -115,13 +116,25 @@ export default function Crear() {
     setErrores(resultado.erroresFormulario)
     setErroresSubtareas(resultado.erroresSubtareas)
 
-    if (
-      Object.keys(resultado.erroresFormulario).length > 0 ||
-      Object.keys(resultado.erroresSubtareas).length > 0 ||
-      resultado.sinPlan
-    ) {
-      return
-    }
+
+if (
+  Object.keys(resultado.erroresFormulario).length > 0 ||
+  Object.keys(resultado.erroresSubtareas).length > 0 ||
+  resultado.sinPlan
+) {
+  const primerCampoInvalido = formularioRef.current?.querySelector(
+    '[aria-invalid="true"]'
+  )
+
+  if (primerCampoInvalido) {
+    primerCampoInvalido.focus()
+  } else if (resultado.sinPlan) {
+    document.getElementById('agregar-gestion')?.focus()
+  }
+
+  return
+}
+
 
     setIsLoading(true)
 
@@ -201,7 +214,12 @@ export default function Crear() {
         </p>
       )}
 
-      <form className="formulario" onSubmit={handleSubmit} noValidate>
+           <form
+           ref={formularioRef}
+           className="formulario"
+           onSubmit={handleSubmit}
+           noValidate
+          >
         <fieldset>
           <legend>1. Identidad y tipo de evento</legend>
 
@@ -394,6 +412,7 @@ export default function Crear() {
 
           <div className="fila-accion">
             <button
+              id="agregar-gestion"
               type="button"
               className="boton boton-primario"
               onClick={() => setSubtareas((anteriores) => [...anteriores, nuevaSubtarea()])}
