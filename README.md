@@ -30,11 +30,16 @@ criterio C7 pide que la SPA corra, no que las vistas estén implementadas.
 
 | Ruta | Para qué | Entra en |
 | --- | --- | --- |
-| `/hoy` | Gestiones urgentes del día, vencidas y próximas | Sprint 2 |
-| `/crear` | Crear evento y plan inicial de subtareas | Sprint 1 |
-| `/evento/:id` | Detalle, edición, reprogramación y conflicto | Sprints 1 y 3 |
-| `/progreso` | Barra de progreso por evento | Sprint 4 |
+| `/` | Redirige automáticamente a `/hoy` | Navegación general |
 | `/login` | Autenticación con correo y contraseña | Sprint 2 |
+| `/registro` | Registro de nuevos organizadores | Sprint 2 |
+| `/hoy` | Consultar y gestionar tareas urgentes, vencidas y próximas | Sprints 2 y 3 |
+| `/crear` | Crear evento y planificación inicial de subtareas | Sprint 1 |
+| `/eventos` | Listado y gestión de eventos | Sprints 1 y 4 |
+| `/evento/:id` | Detalle, edición, reprogramación y gestión de subtareas | Sprints 1 y 3 |
+| `/configuracion` | Configuración de la aplicación | Transversal |
+| `/progreso` | Redirige automáticamente a `/eventos` | Sprint 4 |
+| `*` | Muestra un mensaje cuando la ruta no existe | Transversal |
 
 ## Variables de entorno
 
@@ -70,8 +75,8 @@ Al reemplazar los estilos, conservar el bloque de foco visible.
 
 | Entorno | URL |
 | --- | --- |
-| Frontend en producción | pendiente |
-| API | pendiente |
+| Frontend en producción | https://pi1-grupo2-frontend.vercel.app/login |
+| API | https://pi1-grupo2-api.onrender.com/api/docs/ |
 
 ## Estado
 
